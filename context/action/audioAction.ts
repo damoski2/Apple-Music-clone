@@ -32,3 +32,11 @@ export const setCurrentPlayList = (data: any, dispatch: Dispatch<DispatchType>)=
         payload: data
     })
 }
+
+export const setCurrentSong = (data: any, dispatch: Dispatch<DispatchType>)=>{
+    console.log(data)
+    dispatch({
+        type: 'SET_CURRENT_SONG',
+        payload: data
+    })
+}
