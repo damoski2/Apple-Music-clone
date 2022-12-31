@@ -1,26 +1,35 @@
-html,
-body {
-  padding: 0;
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+@font-face{
+    font-family: 'SF-Pro';
+    src: url('../assets/fonts/SF-Pro-Text-Black.otf')
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+@font-face{
+    font-family: 'SF-Pro';
+    font-weight: bold;
+    src: url('../assets/fonts/SF-Pro-Text-Bold.otf')
 }
 
-* {
-  box-sizing: border-box;
+@font-face {
+    font-family: 'SF-Pro';
+    font-weight: normal;
+    src: url('../assets/fonts/SF-Pro-Text-Regular.otf');
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
-  body {
-    color: white;
-    background: black;
-  }
+@font-face {
+    font-family: 'SF-Pro';
+    font-weight: 500;
+    src: url('../assets/fonts/SF-Pro-Text-Medium.otf')
+}
+
+
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+.main-screen{
+    @apply w-[calc(100vw_-_260px)] flex flex-col
 }
