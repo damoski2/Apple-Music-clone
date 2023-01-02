@@ -62,10 +62,34 @@ export default (state: any, action: any)=>{
                 currentPlaylistTracks: payload
             }
 
+        case 'SET_CURRENT_PLAYLIST_TRACKS_URI':
+            return{
+                ...state,
+                currentPlaylistTracksUri: payload
+            }
+
         case 'SET_CURRENT_SONG':
             return{
                 ...state,
                 currentSong: payload
+            }
+
+        case 'SET_CURRENT_SONG_INDEX':
+            return{
+                ...state,
+                currentSongIndex: payload
+            }
+
+        case 'SET_PREV_SONG':
+            return{
+                ...state,
+                prevSong: payload
+            }
+
+        case 'SET_NEXT_SONG':
+            return{
+                ...state,
+                nextSong: payload
             }
 
         case 'LOG_OUT':

@@ -34,9 +34,32 @@ export const setCurrentPlayList = (data: any, dispatch: Dispatch<DispatchType>)=
 }
 
 export const setCurrentSong = (data: any, dispatch: Dispatch<DispatchType>)=>{
-    console.log(data)
+   // console.log(data)
     dispatch({
         type: 'SET_CURRENT_SONG',
+        payload: data
+    })
+}
+
+
+export const setPrevSong = (data: any, dispatch: Dispatch<DispatchType>)=>{
+    dispatch({
+        type: 'SET_PREV_SONG',
+        payload: data
+    })
+}
+
+export const setNextSong = (data: any, dispatch: Dispatch<DispatchType>)=>{
+    dispatch({
+        type: 'SET_NEXT_SONG',
+        payload: data
+    })
+}
+
+
+export const setCurrentSongIndex = (data: number, dispatch: Dispatch<DispatchType>)=>{
+    dispatch({
+        type: 'SET_CURRENT_SONG_INDEX',
         payload: data
     })
 }

@@ -2,11 +2,16 @@ import React, { useContext, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { Layout } from "../components/import";
+import StyledTable from '../components/Table'
 import { PrivateRoute } from "../utils";
 import { GlobalContext } from "../context/GlobalContext";
 import SpotifyWebApi from "spotify-web-api-node";
-import { Table } from "antd";
-import Styled from "styled-components";
+
+
+import styled from "styled-components";
+import { Table, Input } from "antd";
+
+//import 'antd/dist/reset.css';
 import { millisToMinutesAndSeconds } from "../utils";
 
 import PlayWhiteIcon from "../assets/images/PlayWhiteIcon.svg";
@@ -14,30 +19,12 @@ import ShufffleWhiteIcon from "../assets/images/ShuffleWhiteIcon.svg";
 import PlayListThreeDotIcon from "../assets/images/PlayListThreeDotIcon.svg";
 import SongThreeDotIcon from "../assets/images/SongThreeDotIcon.svg";
 
+
 const spotifyApi = new SpotifyWebApi({
   clientId: "0c064b242e744e0ca6d6dbbc5458c704",
 });
 
-const StyledTable = Styled(Table)`
-.ant-table-tbody > tr > td {
-  background: transparent !important;
-}
-.ant-table-thead > tr > th {
-  background: transparent !important;
-  color: #BFBFBF !important;
-}
-
-.ant-table-row{
-  :nth-child(even){
-    background: #1f1f1f !important;
-  }
-}
-
-.ant-table{
-  background: transparent !important;
-  color: #fff !important;
-}
-`;
+let currentId = "";
 
 const Playlist = () => {
   const { query, isReady } = useRouter();
@@ -47,6 +34,8 @@ const Playlist = () => {
     dispatch,
     currentPlaylistTracks,
     setCurrentSong,
+    setNextSong,
+    setPrevSong,
   } = useContext(GlobalContext);
 
   const [current_hover, set_Current_Hover] = useState<string>("");
@@ -57,6 +46,49 @@ const Playlist = () => {
 
   const handleMouseLeave = (): void => {
     set_Current_Hover("");
+  };
+
+  const findSongIndex = (elem: any) => elem.id === currentId;
+
+  const handleSetCurrentSong = (index: any) => {
+    let _idx = currentPlaylistTracks.findIndex(findSongIndex);
+
+    let _currentSong = currentPlaylistTracks[_idx];
+    setCurrentSong(_currentSong, dispatch);
+    setNextSong(currentPlaylistTracks[_idx + 1], dispatch);
+    setPrevSong(currentPlaylistTracks[_idx - 1], dispatch);
+
+    resetCurrentPlaylistTrack(_idx);
+
+    //console.log('index', _idx)
+  };
+
+  const resetCurrentPlaylistTrack = (_songIndex: number) => {
+    currentPlaylistTracks.forEach((track: any, index: number) => {
+      let _len: number = currentPlaylistTracks.length - 1;
+      let _currIndex = _songIndex;
+      let newTrack = [];
+      while (_currIndex < _len) {
+        newTrack.push(currentPlaylistTracks[_currIndex].uri);
+        _currIndex++;
+      }
+      _currIndex = 0;
+      while (_currIndex < _songIndex) {
+        newTrack.push(currentPlaylistTracks[_currIndex].uri);
+        _currIndex++;
+      }
+
+      index === currentPlaylistTracks.length - 1 &&
+        (() => {
+          console.log("newTrack", newTrack);
+          dispatch({
+            type: "SET_CURRENT_PLAYLIST_TRACKS_URI",
+            payload: newTrack,
+          });
+        })();
+
+      //return newTrack
+    });
   };
 
   useEffect(() => {
@@ -121,7 +153,8 @@ const Playlist = () => {
         <div
           onClick={() => {
             console.log("dassdsasddddadddaaa");
-            setCurrentSong(index, dispatch);
+            currentId = index.id;
+            handleSetCurrentSong(index);
           }}
           className="flex flex-row items-center relative cursor-pointer">
           <Image
@@ -163,7 +196,7 @@ const Playlist = () => {
       key: "time",
       render: (text: string) => (
         <div className="flex flex-row items-center ">
-          <p className="mr-2">{text}</p>
+          <p className="mr-2 mb-0">{text}</p>
           <Image src={SongThreeDotIcon} alt="" />
         </div>
       ),
@@ -206,7 +239,8 @@ const Playlist = () => {
           </div>
 
           <div className="w-full mt-16">
-            <StyledTable
+            {currentPlaylistTracks && (
+              <StyledTable
               columns={columns}
               dataSource={currentPlaylistTracks}
               scroll={{ y: 650 }}
@@ -217,6 +251,7 @@ const Playlist = () => {
                 }
               }
             />
+            )}
           </div>
         </div>
       </Layout>
