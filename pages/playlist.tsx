@@ -52,7 +52,6 @@ const Playlist = () => {
 
   const handleSetCurrentSong = (index: any) => {
     let _idx = currentPlaylistTracks.findIndex(findSongIndex);
-
     let _currentSong = currentPlaylistTracks[_idx];
     setCurrentSong(_currentSong, dispatch);
     setNextSong(currentPlaylistTracks[_idx + 1], dispatch);
@@ -60,12 +59,18 @@ const Playlist = () => {
 
     resetCurrentPlaylistTrack(_idx);
 
-    //console.log('index', _idx)
   };
 
   const resetCurrentPlaylistTrack = (_songIndex: number) => {
     currentPlaylistTracks.forEach((track: any, index: number) => {
-      let _len: number = currentPlaylistTracks.length - 1;
+      let _len: number;
+
+      if(currentPlaylistTracks.length === 1){
+        _len = 1;
+      }else{
+        _len = currentPlaylistTracks.length - 1
+      }
+
       let _currIndex = _songIndex;
       let newTrack = [];
       while (_currIndex < _len) {
@@ -197,7 +202,7 @@ const Playlist = () => {
       render: (text: string) => (
         <div className="flex flex-row items-center ">
           <p className="mr-2 mb-0">{text}</p>
-          <Image src={SongThreeDotIcon} alt="" />
+          <Image src={SongThreeDotIcon} alt="" className="cursor-pointer" />
         </div>
       ),
     },
@@ -245,7 +250,7 @@ const Playlist = () => {
               dataSource={currentPlaylistTracks}
               scroll={{ y: 650 }}
               pagination={
-                currentPlaylistTracks.length > 50 && {
+                currentPlaylistTracks.length > 500 && {
                   defaultPageSize: 10,
                   hideOnSinglePage: true,
                 }

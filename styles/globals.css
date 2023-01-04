@@ -1,3 +1,5 @@
+@import 'antd/dist/antd.css';
+
 
 @font-face{
     font-family: 'SF-Pro';
@@ -33,4 +35,43 @@
 
 .main-screen{
     @apply w-[calc(100vw_-_260px)] flex flex-col
+}
+
+
+
+
+.ant-table-wrapper tr:nth-child(even){
+  background: #1f1f1f !important;
+}
+
+.ant-table-wrapper .ant-table-tbody > tr > td{
+  background: transparent !important;
+  border: none !important;
+}
+.ant-table-thead > tr > th{
+  background: transparent !important;
+  color: #BFBFBF !important;
+  text-align: left !important;
+  border: none !important;
+}
+
+.ant-table-row{
+  height: 56px !important;
+}
+
+.ant-table-row:nth-child(even){
+    background: #1f1f1f !important;
+  }
+
+.ant-table{
+  background: transparent !important;
+  color: #fff !important;
+}
+
+.ant-table-cell{
+  color: #fff !important;
+}
+
+table{
+  width: 100% !important;
 }

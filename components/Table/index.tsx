@@ -14,6 +14,7 @@ tr{
   :nth-child(even){
     background: #1f1f1f !important;
   }
+  height: 56px !important;
 }
 
 .ant-table-wrapper tr:nth-child(even){
@@ -35,6 +36,7 @@ tr{
   :nth-child(even){
     background: #1f1f1f !important;
   }
+  height: 56px !important;
 }
 
 .ant-table{

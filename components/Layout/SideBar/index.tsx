@@ -50,6 +50,7 @@ const Index = () => {
     playlists,
   } = useContext(GlobalContext);
   const ref = useRef<any>(null);
+  const [displaySearchResult, setDisplaySearchResult] = useState<boolean>(false);
 
   useEffect(() => {
     if (!accessToken) return;
@@ -58,10 +59,10 @@ const Index = () => {
 
   useEffect(() => {
     if (!accessToken) return;
-   
+
     spotifyApi.getUserPlaylists().then((data) => {
       let result: any = data.body.items;
-      console.log(data.body.items[0])
+      console.log(data.body.items[0]);
       result = result.map((item: any) => {
         return {
           id: item.id,
@@ -71,7 +72,7 @@ const Index = () => {
           snapshot_id: item.snapshot_id,
           href: item.href,
           tracks: item.tracks,
-          owner: item.owner
+          owner: item.owner,
         };
       });
 
@@ -80,10 +81,16 @@ const Index = () => {
     });
   }, [accessToken]);
 
+  useEffect(()=>{
+    searchResults && setDisplaySearchResult(true)
+  },[searchResults])
+
   useEffect(() => {
     const handleClickOutside = (e: any) => {
       if (ref?.current && !ref?.current?.contains(e.target)) {
-        setGlobalSearchResult([], dispatch);
+        setTimeout(()=>{
+          setDisplaySearchResult(false)
+        },1000)
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -102,13 +109,16 @@ const Index = () => {
 
   return (
     <div className="h-screen max-w-[260px] w-full bg-[#342250] flex flex-col items-center px-[25px] pt-16">
-      <input
-        ref={ref}
-        className="bg-transparent border-[0.1px] text-[#fff] focus:outline-none rounded-sm py-1 pl-6"
-        onChange={handleChange}
-        value={searchInput}
-      />
-      {searchResults && searchResults.length > 0 && <SearchResultModal />}
+      <div className="relative w-full flex flex-row items-center" >
+        <Image src={SearchIcon} alt="" className="absolute left-3 z-10 text-center" />
+        <input
+          ref={ref}
+          className="bg-opacity-6 0 bg-clip-padding backdrop-blur-lg bg-[#342250] border-[0.01px] h-[28px] text-[#fff] focus:outline-none rounded-[4px] py-[1px] pl-8"
+          onChange={handleChange}
+          value={searchInput}
+        />
+      </div>
+      {displaySearchResult && searchResults.length > 0 && <SearchResultModal />}
       <div className="flex flex-col w-full items-start mt-4">
         <span className="text-[10px] text-[#BFBFBF]">Apple Music</span>
         <ul className="w-full">

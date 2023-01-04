@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, useMemo } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import SpotifyPlayer from 'react-spotify-web-playback';
 import { GlobalContext } from '../../../context/GlobalContext'
 
@@ -7,19 +7,20 @@ const NextPlayer = () => {
 
   const { accessToken, currentSong, dispatch, setCurrentSong, setNextSong, setPrevSong, nextSong, prevSong, currentPlaylistTracksUri } = useContext(GlobalContext)
   const [play, setPlay] = useState(false)
+  const [stateTracks, setStateTracks] = useState<any>([]);
+
+  useEffect(()=>{
+    setStateTracks(currentPlaylistTracksUri)
+  },[currentPlaylistTracksUri])
 
 
-  /* let formattedUri = useMemo(()=>{
-    currentPlaylistTracks.map((track:any)=>{
-      return track.uri
-    })
-  },[currentPlaylistTracks])
 
-  console.log('formattedUri', formattedUri) */
 
   if(!accessToken) return null
 
-  return (
+  if(currentPlaylistTracksUri.length < 1) return null
+
+  return stateTracks.length >0 && (
     <SpotifyPlayer
       token={accessToken}
       showSaveIcon
