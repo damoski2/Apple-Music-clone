@@ -4,9 +4,9 @@ const spotifyWebApi = require('spotify-web-api-node')
 
 export default async function handler(req: NextApiRequest,res: NextApiResponse){
 
-    console.log('yeah ...')
+    console.log('yeah ...', req.body.refreshToken)
 
-    const refreshToken = req.body._refreshToken;
+    const refreshToken = req.body.refreshToken;
     const spotifyApi = new spotifyWebApi({
         redirectUri: 'http://localhost:3000',
         clientId: '0c064b242e744e0ca6d6dbbc5458c704',
@@ -17,8 +17,8 @@ export default async function handler(req: NextApiRequest,res: NextApiResponse){
     spotifyApi.refreshAccessToken().then((data: any)=>{
         console.log(data.body)
         res.json({
-            accessToken: data.body.accessToken,
-            expiresIn: data.body.expiresIn
+            accessToken: data.body.access_token,
+            expiresIn: data.body.expires_in
         })
     }).catch((err: any)=>{
         //console.log('error', err)

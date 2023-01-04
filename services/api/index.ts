@@ -1,3 +1,6 @@
+import { millsecondstoISODateconverter } from '../../utils'
+
+
 export const persistTokens = (_tokenType: string, token: any)=>{
    switch(_tokenType){
          case 'SET_ACCESS_TOKEN':
@@ -9,7 +12,8 @@ export const persistTokens = (_tokenType: string, token: any)=>{
             break;
 
         case 'SET_EXPIRES_IN':
-            localStorage.setItem('expiresIn', token)
+            let _expiresIn: any = millsecondstoISODateconverter(token)
+            localStorage.setItem('expiresIn', _expiresIn)
             break;
 
         case 'SET_AUTH_CODE':
@@ -40,11 +44,11 @@ export const checkPersistedTokens = (_tokenType: string)=>{
     }
 }
 
-export const isSessionUser = (expire_in: number): boolean=>{
+export const isSessionUser = (expire_in: any): boolean=>{
     if(!expire_in) return false;
-   /*  console.log(((expire_in - 60) * 1000)+ Date.now()  > Date.now())
-    console.log(((expire_in - 60) * 1000)+ Date.now(), Date.now()) */
-    return ((expire_in - 60) * 1000)+ Date.now()  > Date.now()
+
+    //console.log('check dates', new Date(expire_in) > new Date(Date.now()+3600000))
+   return new Date(expire_in) > new Date(Date.now()+3600000);
 }
 
 

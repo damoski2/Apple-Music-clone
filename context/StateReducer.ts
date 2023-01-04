@@ -1,3 +1,8 @@
+import { millsecondstoISODateconverter } from '../utils'
+
+
+
+
 export default (state: any, action: any)=>{
     const { payload } = action
 
@@ -5,7 +10,7 @@ export default (state: any, action: any)=>{
         case 'SET_ACCESS_TOKEN':
             return{
                 ...state,
-                accessToken: payload.accessToken,
+                accessToken: payload.accessToken || payload.access_token,
             }
 
         case 'SET_REFRESH_TOKEN':
@@ -15,9 +20,10 @@ export default (state: any, action: any)=>{
             }
 
         case 'SET_EXPIRES_IN':
+            let expIn = millsecondstoISODateconverter(payload.expiresIn || payload.expires_in)
             return{
                 ...state,
-                expiresIn: payload.expiresIn
+                expiresIn: expIn
             }
 
         case 'SET_AUTH_CODE':

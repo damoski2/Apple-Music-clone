@@ -17,6 +17,12 @@ const useAuth = (code: string) => {
   const [_refreshToken, _setRefreshToken] = useState("");
   const [_expiresIn, _setExpiresIn] = useState("");
 
+
+
+
+
+
+
   useEffect(() => {
     if (typeof code === "string" && code.length > 0) {
       handleSetLoader(true, dispatch);
@@ -44,7 +50,7 @@ const useAuth = (code: string) => {
     }
   }, [code]);
 
-  useEffect(() => {
+/*   useEffect(() => {
     if (
       !checkPersistedTokens("SET_ACCESS_TOKEN") ||
       !checkPersistedTokens("SET_EXPIRES_IN") ||
@@ -75,7 +81,9 @@ const useAuth = (code: string) => {
     }, (parseInt(expiresIn) - 60) * 1000);
 
     return () => clearInterval(interval);
-  }, [refreshToken, expiresIn]);
+  }, [refreshToken, expiresIn]); */
+
+
   return accessToken;
 };
 

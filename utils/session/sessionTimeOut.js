@@ -9,16 +9,17 @@ import React, {
   import moment from "moment";
   import { clearSession, returnExpiryDate } from "../index";
   import { isSessionUser } from "../../services";
-  import { checkPersistedTokens } from '../../services'
+  import { checkPersistedTokens, persistTokens } from '../../services'
   import { GlobalContext } from "../../context/GlobalContext";
   import { useRouter } from "next/router";
+  import axios from 'axios'
   
   
   
   
   const SessionTimeout = () => {
     const router = useRouter();
-    const { dispatch } = useContext(GlobalContext);
+    const { dispatch, setTokenSession, handleSetLoader, refreshToken } = useContext(GlobalContext);
   
     const [events, setEvents] = useState(["click", "load", "scroll"]);
     const [second, setSecond] = useState(0);
@@ -39,29 +40,43 @@ import React, {
       clearTimeout(startTimerInterval.current);
       clearInterval(warningInactiveInterval.current);
   
-      if (isSessionUser(parseInt(returnExpiryDate()))) {
+      if (isSessionUser(returnExpiryDate())){
+        //console.log(isSessionUser(parseInt(returnExpiryDate())))
         timeStamp = moment(returnExpiryDate());
         //console.log('timeStamp', timeStamp)
         sessionStorage.setItem("lastTimeStamp", timeStamp);
       } else {
         clearInterval(warningInactiveInterval.current);
         sessionStorage.removeItem("lastTimeStamp");
-  
+       
+        axios
+        .post(`/api/refresh`, {
+          refreshToken,
+        })
+        .then((res) => {
+          persistTokens("SET_ACCESS_TOKEN", res.data.accessToken);
+          persistTokens("SET_EXPIRES_IN", res.data.expiresIn);
+
+          setTokenSession(res.data, dispatch, "SET_ACCESS_TOKEN");
+          setTokenSession(res.data, dispatch, "SET_EXPIRES_IN");
+        })
+        .catch((err) => {})
+        .finally(() => {
+          handleSetLoader(false, dispatch);
+        });
+        
         //Logout user
-        checkPersistedTokens('SET_ACCESS_TOKEN') &&
+        /* checkPersistedTokens('SET_ACCESS_TOKEN') &&
           (() => {
             clearSession();
-            /* NotifyService.setTitle("Error")
-              .setMessage("Session Expired, You have to login again")
-              .error(); */
             dispatch({
               type: "LOG_OUT",
             });
             router.push('/login');
-          })();
+          })(); */
       }
       timeChecker();
-    }, [isSessionUser(returnExpiryDate())]);
+    }, [isSessionUser(returnExpiryDate()), refreshToken]);
   
     // warning timer
     let warningInactive = (timeString) => {
