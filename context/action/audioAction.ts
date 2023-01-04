@@ -63,3 +63,17 @@ export const setCurrentSongIndex = (data: number, dispatch: Dispatch<DispatchTyp
         payload: data
     })
 }
+
+export const setNewReleases = (data: any, dispatch: Dispatch<DispatchType>)=>{
+    dispatch({
+        type: 'SET_NEW_RELEASES',
+        payload: data
+    })
+}
+
+export const setRecentlyPlayedTracks = (data: any, dispatch: Dispatch<DispatchType>)=>{
+    dispatch({
+        type: 'SET_RECENTLY_PLAYED_TRACKS',
+        payload: data
+    })
+}

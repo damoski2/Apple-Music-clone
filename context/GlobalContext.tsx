@@ -1,6 +1,6 @@
 import React, { useContext, useReducer, useLayoutEffect, useEffect, createContext } from 'react'
 import StateReducer from './StateReducer'
-import { setTokenSession, handleSetLoader, setGlobalSearchInput, setGlobalSearchResult, setPlaylists, setCurrentPlayList, setCurrentSong, setNextSong, setPrevSong } from './action'
+import { setTokenSession, handleSetLoader, setGlobalSearchInput, setGlobalSearchResult, setPlaylists, setCurrentPlayList, setCurrentSong, setNextSong, setPrevSong, setNewReleases, setRecentlyPlayedTracks } from './action'
 import { checkPersistedTokens } from '../services'
 
 interface Props {
@@ -23,7 +23,9 @@ const initialState: any = {
   currentSong: null,
   prevSong: null,
   nextSong: null,
-  currentSongIndex: 0
+  currentSongIndex: 0,
+  newReleases: [],
+  recentlyPlayedTracks: []
 }
 
 export const GlobalContext = createContext(initialState);
@@ -96,6 +98,8 @@ export const GlobalProvider = ({ children }: Props) => {
       setCurrentSong,
       setNextSong,
       setPrevSong,
+      setNewReleases,
+      setRecentlyPlayedTracks,
       dispatch
     }} >
       {children}

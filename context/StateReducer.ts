@@ -20,7 +20,14 @@ export default (state: any, action: any)=>{
             }
 
         case 'SET_EXPIRES_IN':
-            let expIn = millsecondstoISODateconverter(payload.expiresIn || payload.expires_in)
+            let expIn;
+            if(payload.expiresIn?.toString().length > 4 || payload.expires_in?.toString().length > 4){
+                expIn = payload.expiresIn || payload.expires_in
+                
+            }else{
+                expIn = millsecondstoISODateconverter(payload.expiresIn || payload.expires_in)
+            }
+            
             return{
                 ...state,
                 expiresIn: expIn
@@ -96,6 +103,18 @@ export default (state: any, action: any)=>{
             return{
                 ...state,
                 nextSong: payload
+            }
+
+        case 'SET_NEW_RELEASES':
+            return{
+                ...state,
+                newReleases: payload
+            }
+
+        case 'SET_RECENTLY_PLAYED_TRACKS':
+            return{
+                ...state,
+                recentlyPlayedTracks: payload
             }
 
         case 'LOG_OUT':

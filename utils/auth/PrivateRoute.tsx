@@ -85,6 +85,44 @@ const PrivateRoute = ({ children, code }: Props) => {
     return () => (cancel = true);
   }, [searchInput, accessToken]);
 
+
+  useEffect(()=>{
+    if (!accessToken) return;
+
+  /*   spotifyApi.getAvailableGenreSeeds()
+    .then((data) => {
+      console.log('genre seed', data.body)
+    }) */
+
+    spotifyApi.getCategories({
+      limit : 5,
+      offset: 0,
+      country: 'SE',
+      locale: 'sv_SE'
+  })
+  .then((data)=>{
+    console.log('categories',data.body);
+  }, (err) =>{
+    console.log("Something went wrong!", err);
+  });
+
+    spotifyApi.getNewReleases({ limit : 10, offset: 0, country: 'US' })
+    .then((data) => {
+      console.log('new release USA', data.body)
+    })
+
+    spotifyApi.getNewReleases({ limit : 10, offset: 0, country: 'NG' })
+    .then((data) => {
+      console.log('new release Nigeria', data.body)
+    })
+
+  },[accessToken])
+
+
+
+
+
+
   useAuth(query.code as string);
 
   return children;

@@ -1,4 +1,5 @@
 import React, { useState, useContext, useRef, useEffect } from "react";
+import { useRouter, NextRouter } from 'next/router'
 import Link from "next/link";
 import Image from "next/image";
 import SearchIcon from "../../../assets/images/SearchIcon.svg";
@@ -41,15 +42,19 @@ const Index = () => {
   const {
     dispatch,
     setGlobalSearchInput,
-    setGlobalSearchResult,
     setCurrentPlayList,
     searchResults,
     searchInput,
     accessToken,
     setPlaylists,
     playlists,
+    auth_code
   } = useContext(GlobalContext);
   const ref = useRef<any>(null);
+  const { query, pathname }: NextRouter = useRouter()
+  const router: NextRouter = useRouter()
+
+
   const [displaySearchResult, setDisplaySearchResult] = useState<boolean>(false);
 
   useEffect(() => {
@@ -107,6 +112,41 @@ const Index = () => {
 
   const handleSelectTrack = (value: any) => {};
 
+
+  const returnActive = (value: string, playlistPath: string | null = null): ReturnType<()=> boolean> => {
+    switch(pathname){
+      case '/':
+        return value === '/'
+
+      case '/browse':
+        return value === '/browse'
+
+      case '/radio':
+        return value === '/radio'
+
+      case '/recently-added':
+        return value === '/recently-added'
+
+      case '/artist':
+        return value === '/artist'
+
+      case '/albums':
+        return value === '/albums'
+
+      case '/songs':
+        return value === '/songs'
+
+      case '/playlist':
+        return playlistPath === query?.playlist_id
+      
+
+      default:
+        return false
+
+    }
+  }
+
+
   return (
     <div className="h-screen max-w-[260px] w-full bg-[#342250] flex flex-col items-center px-[25px] pt-16">
       <div className="relative w-full flex flex-row items-center" >
@@ -121,10 +161,11 @@ const Index = () => {
       {displaySearchResult && searchResults.length > 0 && <SearchResultModal />}
       <div className="flex flex-col w-full items-start mt-4">
         <span className="text-[10px] text-[#BFBFBF]">Apple Music</span>
-        <ul className="w-full">
+        <ul className="w-full mt-2">
           <li
-            className={`flex w-full flex-row items-center mt-2 pl-3 rounded-md ${
-              active && "bg-[#342250]/10"
+            onClick={()=> router.push(`/?code=${auth_code}`)}
+            className={`flex w-full cursor-pointer flex-row items-center pl-3 py-1.5 rounded-md ${
+              returnActive(`/`) && "bg-opacity-10 bg-gray-200 bg-opacity-10 bg-gray-200"
             }`}>
             <div className="w-[20px]">
               <Image src={ListenNowIcon} alt="" />
@@ -132,8 +173,8 @@ const Index = () => {
             <span className="ml-2 text-white text-[13px]">Listen Now</span>
           </li>
           <li
-            className={`flex w-full flex-row items-center mt-2 pl-3 rounded-md ${
-              active && "bg-[#342250]/10"
+            className={`flex w-full flex-row cursor-pointer items-center pl-3 py-1.5 rounded-md ${
+              returnActive('/browse') && "bg-opacity-10 bg-gray-200 bg-[#342250]/10"
             }`}>
             <div className="w-[20px]">
               <Image src={BrowseIcon} alt="" />
@@ -141,8 +182,8 @@ const Index = () => {
             <span className="ml-2 text-white text-[13px]">Browse</span>
           </li>
           <li
-            className={`flex w-full flex-row items-center mt-2 pl-3 rounded-md ${
-              active && "bg-[#342250]/10"
+            className={`flex w-full flex-row cursor-pointer items-center pl-3 py-1.5 rounded-md ${
+              returnActive('/radio') && "bg-opacity-10 bg-gray-200 bg-[#342250]/10"
             }`}>
             <div className="w-[20px]">
               <Image src={RadioIcon} alt="" />
@@ -153,8 +194,8 @@ const Index = () => {
         <span className="text-[10px] mt-5 text-[#BFBFBF]">Library</span>
         <ul className="w-full">
           <li
-            className={`flex w-full flex-row items-center mt-2 pl-3 rounded-md ${
-              active && "bg-[#342250]/10"
+            className={`flex w-full flex-row cursor-pointer items-center pl-3 py-1.5 rounded-md ${
+              returnActive('/recently-added') && "bg-opacity-10 bg-gray-200 bg-[#342250]/10"
             }`}>
             <div className="w-[20px]">
               <Image src={RecentlyAddedIcon} alt="" />
@@ -162,8 +203,8 @@ const Index = () => {
             <span className="ml-2 text-white text-[13px]">Recently Added</span>
           </li>
           <li
-            className={`flex w-full flex-row items-center mt-2 pl-3 rounded-md ${
-              active && "bg-[#342250]/10"
+            className={`flex w-full flex-row cursor-pointer items-center pl-3 py-1.5 rounded-md ${
+              returnActive('/artist') && "bg-opacity-10 bg-gray-200 bg-[#342250]/10"
             }`}>
             <div className="w-[20px]">
               <Image src={ArtistIcon} alt="" />
@@ -171,8 +212,8 @@ const Index = () => {
             <span className="ml-2 text-white text-[13px]">Artists</span>
           </li>
           <li
-            className={`flex w-full flex-row items-center mt-2 pl-3 rounded-md ${
-              active && "bg-[#342250]/10"
+            className={`flex w-full flex-row cursor-pointer items-center pl-3 py-1.5 rounded-md ${
+              returnActive('/albums') && "bg-opacity-10 bg-gray-200 bg-[#342250]/10"
             }`}>
             <div className="w-[20px]">
               <Image src={AlbumsIcon} alt="" />
@@ -180,8 +221,8 @@ const Index = () => {
             <span className="ml-2 text-white text-[13px]">Albums</span>
           </li>
           <li
-            className={`flex w-full flex-row items-center mt-2 pl-3 rounded-md ${
-              active && "bg-[#342250]/10"
+            className={`flex w-full flex-row cursor-pointer items-center pl-3 py-1.5 rounded-md ${
+              returnActive('/songs') && "bg-opacity-10 bg-gray-200 bg-[#342250]/10"
             }`}>
             <div className="w-[20px]">
               <Image src={SongsIcon} alt="" />
@@ -196,8 +237,8 @@ const Index = () => {
               <li
                 onClick={() => setCurrentPlayList(item, dispatch)}
                 key={index}
-                className={`flex w-full flex-row items-center mt-2 pl-3 rounded-md ${
-                  active && "bg-[#342250]/10"
+                className={`flex w-full flex-row cursor-pointer items-center pl-3 py-1.5 rounded-md ${
+                  returnActive('/playlist', item?.id) && "bg-opacity-10 bg-gray-200"
                 } cursor-pointer `}>
                 <div className="w-[20px]">
                   <Image src={RecentlyAddedIcon} alt="" />
