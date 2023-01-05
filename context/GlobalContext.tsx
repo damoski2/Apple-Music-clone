@@ -25,7 +25,8 @@ const initialState: any = {
   nextSong: null,
   currentSongIndex: 0,
   newReleases: [],
-  recentlyPlayedTracks: []
+  recentlyPlayedTracks: [],
+  randomArtistSeeds: [],
 }
 
 export const GlobalContext = createContext(initialState);
@@ -85,6 +86,19 @@ export const GlobalProvider = ({ children }: Props) => {
       })
     }
   },[state.currentPlaylistTracks])
+
+  useEffect(()=>{
+    if(state.playlists.length > 0){
+      let random1: number = Math.floor(Math.random() * state.playlists.length), random2 : number = Math.floor(Math.random() * state.playlists.length);
+      while(random1 === random2){
+        random2 = Math.floor(Math.random() * state.playlists.length);
+      }
+      dispatch({
+        type: 'SET_RANDOM_ARTIST_SEEDS',
+        payload: [state.playlists[random1].uri, state.playlists[random2].uri]
+      })
+    }
+  },[state.playlists])
 
   return (
     <GlobalContext.Provider value={{

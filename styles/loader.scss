@@ -1,0 +1,115 @@
+
+@-moz-keyframes fade {
+	from {
+		background: #777;
+	}
+}
+
+@keyframes fade {
+	from {
+		background: #777;
+	}
+}
+
+@-webkit-keyframes fade {
+	from {
+		background: #777;
+	}
+}
+
+
+#loading {
+  background: #ddd;
+  border-radius: 30px;
+  height: 180px;
+  margin: -90px 0 0 -90px;
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  width: 180px;
+}
+
+.bubble {
+  border-radius: 4px;
+  height: 30px;
+  margin: -15px 0 0 -4px;
+  position: absolute;
+  width: 8px;
+  -moz-animation-name: fade;
+	-moz-animation-duration: 1.2s;
+	-moz-animation-iteration-count: infinite;
+	-moz-animation-timing-function: linear;
+  -webkit-animation-name: fade;
+	-webkit-animation-duration: 1.2s;
+	-webkit-animation-iteration-count: infinite;
+	-webkit-animation-timing-function: linear;
+}
+
+@for $i from 1 through 12 {
+  .bubble:nth-of-type(#{$i + 1}) {
+    -moz-transform: rotate(30deg * $i);
+    -moz-animation-delay: 0.1s * $i;
+    -webkit-transform: rotate(30deg * $i);
+    -webkit-animation-delay: 0.1s * $i;
+  }
+}
+
+.bubble:nth-of-type(1) {
+  left: 50%;
+  top: 30%;
+}
+
+.bubble:nth-of-type(2) {
+  left: 60%;
+  top: 33%;
+}
+
+.bubble:nth-of-type(3) {
+  left: 67%;
+  top: 40%;
+}
+
+.bubble:nth-of-type(4) {
+  left: 70%;
+  top: 50%;
+}
+
+.bubble:nth-of-type(5) {
+  left: 67%;
+  top: 60%;
+}
+
+.bubble:nth-of-type(6) {
+  left: 60%;
+  top: 67%;
+}
+
+.bubble:nth-of-type(7) {
+  left: 50%;
+  top: 70%;
+}
+
+.bubble:nth-of-type(8) {
+  left: 40%;
+  top: 67%;
+}
+
+.bubble:nth-of-type(9) {
+  left: 33%;
+  top: 60%;
+}
+
+.bubble:nth-of-type(10) {
+  left: 30%;
+  top: 50%;
+}
+
+.bubble:nth-of-type(11) {
+  left: 33%;
+  top: 40%;
+}
+
+.bubble:nth-of-type(12) {
+  left: 40%;
+  top: 33%;
+}

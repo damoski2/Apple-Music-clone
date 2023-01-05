@@ -117,6 +117,12 @@ export default (state: any, action: any)=>{
                 recentlyPlayedTracks: payload
             }
 
+        case 'SET_RANDOM_ARTIST_SEEDS':
+            return{
+                ...state,
+                randomArtistSeeds: payload
+            }
+
         case 'LOG_OUT':
             return{
                 ...state,
