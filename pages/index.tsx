@@ -5,6 +5,8 @@ import styles from '../styles/Home.module.css'
 import { Layout, Loader } from '../components/import'
 import { PrivateRoute } from '../utils'
 import { GlobalContext } from '../context/GlobalContext'
+import { Divider } from 'antd'
+import RegularCard from '../components/Card/RegularCard'
 
 
 
@@ -12,7 +14,7 @@ import { GlobalContext } from '../context/GlobalContext'
 
 export default function Home() {
   
-
+  const { artistsLists } = useContext(GlobalContext)
 
   return (
    <PrivateRoute>
@@ -24,7 +26,14 @@ export default function Home() {
       </Head>
       <div className="bg-[#323232] pt-[90px] px-10 h-full" >
         <h1 className="text-4xl font-semibold text-[#ffffeb]" >Listen Now</h1>
-        {/* <Loader /> */}
+        <Divider className="bg-[#4D4D4D] mt-2 h-[0.1px]" />
+
+        <div>
+          <h3 className="text-[17px] font-medium text-[#ffffeb]" >Top Artists</h3>
+        </div>
+
+        <RegularCard />
+
       </div>
     </Layout>
    </PrivateRoute>

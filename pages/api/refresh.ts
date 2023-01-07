@@ -4,7 +4,6 @@ const spotifyWebApi = require('spotify-web-api-node')
 
 export default async function handler(req: NextApiRequest,res: NextApiResponse){
 
-    console.log('yeah ...', req.body.refreshToken)
 
     const refreshToken = req.body.refreshToken;
     const spotifyApi = new spotifyWebApi({

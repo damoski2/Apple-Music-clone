@@ -85,7 +85,7 @@ const Playlist = () => {
 
       index === currentPlaylistTracks.length - 1 &&
         (() => {
-          console.log("newTrack", newTrack);
+          //console.log("newTrack", newTrack);
           dispatch({
             type: "SET_CURRENT_PLAYLIST_TRACKS_URI",
             payload: newTrack,
@@ -157,7 +157,7 @@ const Playlist = () => {
       render: (data: any, index: any) => (
         <div
           onClick={() => {
-            console.log("dassdsasddddadddaaa");
+
             currentId = index.id;
             handleSetCurrentSong(index);
           }}

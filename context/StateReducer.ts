@@ -123,6 +123,12 @@ export default (state: any, action: any)=>{
                 randomArtistSeeds: payload
             }
 
+        case 'SET_ARTISTS_LISTS':
+            return{
+                ...state,
+                artistsLists: payload
+            }
+
         case 'LOG_OUT':
             return{
                 ...state,

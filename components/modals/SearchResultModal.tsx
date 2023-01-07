@@ -22,7 +22,7 @@ const SearchResultModal = () => {
           <>
             <li
               onClick={() => {
-                console.log("music selected", result);
+                //console.log("music selected", result);
                 handleMusicSelect(result);
               }}
               key={index}

@@ -25,6 +25,7 @@ const PrivateRoute = ({ children, code }: Props) => {
     setGlobalSearchResult,
     searchInput,
     accessToken,
+    randomArtistSeeds,
   } = useContext(GlobalContext);
 
   const { isReady, query, pathname } = useRouter();
@@ -85,43 +86,55 @@ const PrivateRoute = ({ children, code }: Props) => {
     return () => (cancel = true);
   }, [searchInput, accessToken]);
 
-
-  useEffect(()=>{
+  useEffect(() => {
     if (!accessToken) return;
 
-  /*   spotifyApi.getAvailableGenreSeeds()
+    /*   spotifyApi.getAvailableGenreSeeds()
     .then((data) => {
       console.log('genre seed', data.body)
     }) */
 
-    spotifyApi.getCategories({
-      limit : 5,
-      offset: 0,
-      country: 'SE',
-      locale: 'sv_SE'
-  })
-  .then((data)=>{
-    console.log('categories',data.body);
-  }, (err) =>{
-    console.log("Something went wrong!", err);
-  });
+    spotifyApi
+      .getCategories({
+        limit: 5,
+        offset: 0,
+        country: "SE",
+        locale: "sv_SE",
+      })
+      .then(
+        (data) => {
+          console.log("categories", data.body);
+        },
+        (err) => {
+          //console.log("Something went wrong!", err);
+        }
+      );
 
-    spotifyApi.getNewReleases({ limit : 10, offset: 0, country: 'US' })
-    .then((data) => {
-      console.log('new release USA', data.body)
-    })
+    spotifyApi
+      .getNewReleases({ limit: 10, offset: 0, country: "US" })
+      .then((data) => {
+        console.log("new release USA", data.body);
+      });
 
-    spotifyApi.getNewReleases({ limit : 10, offset: 0, country: 'NG' })
-    .then((data) => {
-      console.log('new release Nigeria', data.body)
-    })
+    spotifyApi
+      .getNewReleases({ limit: 10, offset: 0, country: "NG" })
+      .then((data) => {
+        console.log("new release Nigeria", data.body);
+      });
 
-  },[accessToken])
+    if (randomArtistSeeds.length > 0) {
+      spotifyApi
+        .getArtistRelatedArtists(randomArtistSeeds[0] as string)
+        .then((data) => {
+          console.log("related artist", data.body);
+        });
 
-
-
-
-
+      spotifyApi.getArtists(randomArtistSeeds).then((data) => {
+        console.log("artist", data.body);
+      });
+  
+    }
+  }, [accessToken, randomArtistSeeds]);
 
   useAuth(query.code as string);
 
