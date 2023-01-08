@@ -62,7 +62,7 @@ import React, {
         })
         .catch((err) => {})
         .finally(() => {
-          handleSetLoader(false, dispatch);
+          //handleSetLoader(false, dispatch);
         });
         
         //Logout user

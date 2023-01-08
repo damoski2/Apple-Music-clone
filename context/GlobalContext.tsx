@@ -18,9 +18,11 @@ import {
   setPrevSong,
   setNewReleases,
   setRecentlyPlayedTracks,
+  setNewReleasesTracks
 } from "./action";
 import { checkPersistedTokens } from "../services";
 import SpotifyWebApi from "spotify-web-api-node";
+import { loader_types } from "../types";
 
 const spotifyApi = new SpotifyWebApi({
   clientId: "0c064b242e744e0ca6d6dbbc5458c704",
@@ -36,7 +38,10 @@ const initialState: any = {
   refreshToken: null,
   expiresIn: null,
   auth_code: null,
-  loading: false,
+  loading: {
+    state: "not_loading" as loader_types,
+    value: false,
+  },
   searchInput: "",
   searchResults: [],
   playlists: [],
@@ -51,6 +56,7 @@ const initialState: any = {
   recentlyPlayedTracks: [],
   randomArtistSeeds: [],
   artistsLists: [],
+  newReleaseTracks: []
 };
 
 export const GlobalContext = createContext(initialState);
@@ -117,46 +123,70 @@ export const GlobalProvider = ({ children }: Props) => {
     spotifyApi.setAccessToken(state.accessToken);
 
     const seedRequest = async () => {
+      await dispatch({
+        type: "LOADING_PAGE",
+        payload: {
+          state: "load_artists",
+          value: true,
+        } as {
+          state: loader_types;
+          value: boolean;
+        },
+      });
       if (state.playlists.length > 0) {
-        let random1: number = Math.floor(Math.random() * state.playlists.length),
+        let random1: number = Math.floor(
+            Math.random() * state.playlists.length
+          ),
           random2: number = Math.floor(Math.random() * state.playlists.length);
-  
-        let _artistId1: string = '',
-          _artsisId2: string = '';
+
+        let _artistId1: string = "",
+          _artsisId2: string = "";
 
         let artistsLists: any = [];
-  
+
         while (random1 === random2) {
           random2 = Math.floor(Math.random() * state.playlists.length);
         }
-  
-        _artistId1 = await spotifyApi.getPlaylistTracks(state.playlists[random1].id).then((data) => {
-          let tracks: any = data.body.items;
-          random1 = Math.floor(Math.random() * tracks.length);
-          return tracks[random1].track.artists[0].id;
-        });
-  
-        _artsisId2 = await spotifyApi.getPlaylistTracks(state.playlists[random2].id).then((data) => {
-          let tracks: any = data.body.items;
-          random2 = Math.floor(Math.random() * tracks.length);
-          return tracks[random2].track.artists[0].id;
-        });
 
-        while(artistsLists.length < 10){
-          let random: number = Math.floor(Math.random() * state.playlists.length);
-          let _artistId: any = await spotifyApi.getPlaylistTracks(state.playlists[random].id).then((data) => {
+        _artistId1 = await spotifyApi
+          .getPlaylistTracks(state.playlists[random1].id)
+          .then((data) => {
             let tracks: any = data.body.items;
-            random = Math.floor(Math.random() * tracks.length);
-
-            return tracks[random].track.artists[0].id;
+            random1 = Math.floor(Math.random() * tracks.length);
+            return tracks[random1].track.artists[0].id;
           });
-          artistsLists.includes(_artistId) ? null : artistsLists.push(_artistId)
+
+        _artsisId2 = await spotifyApi
+          .getPlaylistTracks(state.playlists[random2].id)
+          .then((data) => {
+            let tracks: any = data.body.items;
+            random2 = Math.floor(Math.random() * tracks.length);
+            return tracks[random2].track.artists[0].id;
+          });
+
+        while (artistsLists.length < 10) {
+          let random: number = Math.floor(
+            Math.random() * state.playlists.length
+          );
+          let _artistId: any = await spotifyApi
+            .getPlaylistTracks(state.playlists[random].id)
+            .then((data) => {
+              let tracks: any = data.body.items;
+              random = Math.floor(Math.random() * tracks.length);
+
+              return tracks[random].track.artists[0].id;
+            });
+          artistsLists.includes(_artistId)
+            ? null
+            : artistsLists.push(_artistId);
         }
-        
-        artistsLists = await spotifyApi.getArtists(artistsLists).then(data=>{
-          //console.log('artists...',data.body.artists)
-          return data.body.artists;
-        })
+
+        artistsLists = await spotifyApi
+          .getArtists(artistsLists)
+          .then((data) => {
+            //console.log('artists...',data.body.artists)
+            return data.body.artists;
+          });
 
         await dispatch({
           type: "SET_RANDOM_ARTIST_SEEDS",
@@ -166,12 +196,22 @@ export const GlobalProvider = ({ children }: Props) => {
         await dispatch({
           type: "SET_ARTISTS_LISTS",
           payload: artistsLists,
-        })
+        });
+
+        await dispatch({
+          type: "LOADING_PAGE",
+          payload: {
+            state: "not_loading",
+            value: false,
+          } as {
+            state: loader_types;
+            value: boolean;
+          },
+        });
       }
-    }
+    };
 
     seedRequest();
-    
   }, [state.playlists, state.accessToken]);
 
   return (
@@ -189,6 +229,7 @@ export const GlobalProvider = ({ children }: Props) => {
         setPrevSong,
         setNewReleases,
         setRecentlyPlayedTracks,
+        setNewReleasesTracks,
         dispatch,
       }}>
       {children}

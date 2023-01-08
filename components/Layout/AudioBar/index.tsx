@@ -36,7 +36,7 @@ const Index = () => {
 
 
     return (
-        <div className="h-15 w-[calc(100vw_-_260px)] fixed bg-[#2C2C2C] flex items-center pt-[10px]" >
+        <div className="h-15 z-50 w-[calc(100vw_-_260px)] fixed bg-[#2C2C2C] flex items-center pt-[10px]" >
             <audio ref={audioElem} src={currentSong.url} onTimeUpdate={onPlaying} />
             <div className="w-7/12 mx-auto" >
             <NextPlayer />

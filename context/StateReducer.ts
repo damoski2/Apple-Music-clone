@@ -129,6 +129,12 @@ export default (state: any, action: any)=>{
                 artistsLists: payload
             }
 
+        case 'SET_NEW_RELEASES_TRACKS':
+            return{
+                ...state,
+                newReleaseTracks: payload
+            }
+
         case 'LOG_OUT':
             return{
                 ...state,

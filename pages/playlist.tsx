@@ -6,10 +6,7 @@ import StyledTable from '../components/Table'
 import { PrivateRoute } from "../utils";
 import { GlobalContext } from "../context/GlobalContext";
 import SpotifyWebApi from "spotify-web-api-node";
-
-
-import styled from "styled-components";
-import { Table, Input } from "antd";
+import { loader_types } from '../types'
 
 //import 'antd/dist/reset.css';
 import { millisToMinutesAndSeconds } from "../utils";
@@ -36,6 +33,7 @@ const Playlist = () => {
     setCurrentSong,
     setNextSong,
     setPrevSong,
+    handleSetLoader,
   } = useContext(GlobalContext);
 
   const [current_hover, set_Current_Hover] = useState<string>("");
@@ -105,6 +103,8 @@ const Playlist = () => {
     if (!isReady) return;
     if (!query.playlist_id) return;
 
+    handleSetLoader({ state: 'load_playlist', value: true } as { state: loader_types, value: boolean }, dispatch)
+
     spotifyApi.getPlaylist(query.playlist_id as string).then((data) => {
       let playlist = data.body;
       dispatch({
@@ -146,6 +146,7 @@ const Playlist = () => {
         payload: tracks,
       });
     });
+    handleSetLoader({ state: 'not_loading', value: false } as { state: loader_types, value: boolean }, dispatch)
   }, [accessToken, isReady, query]);
 
   const columns = [

@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@types/lodash": "^4.14.191",
     "@types/node": "18.11.9",
     "@types/react": "18.0.25",
     "@types/react-dom": "18.0.9",
@@ -20,6 +21,7 @@
     "eslint": "8.28.0",
     "eslint-config-next": "13.0.5",
     "express": "^4.18.2",
+    "lodash": "^4.17.21",
     "moment": "^2.29.4",
     "next": "13.0.5",
     "react": "18.2.0",
@@ -27,6 +29,8 @@
     "react-jinke-music-player": "^4.24.2",
     "react-player": "^2.11.0",
     "react-spotify-web-playback": "^0.10.0",
+    "react-spring": "^9.6.1",
+    "react-use-gesture": "^9.1.3",
     "sass": "^1.57.1",
     "spotify-web-api-node": "^5.0.2",
     "styled-components": "^5.3.6",

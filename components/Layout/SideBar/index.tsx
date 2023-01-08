@@ -148,7 +148,7 @@ const Index = () => {
 
 
   return (
-    <div className="h-screen max-w-[260px] w-full bg-[#342250] flex flex-col items-center px-[25px] pt-16">
+    <div className="h-screen fixed max-w-[260px] w-full bg-[#342250] flex flex-col items-center px-[25px] pt-16">
       <div className="relative w-full flex flex-row items-center" >
         <Image src={SearchIcon} alt="" className="absolute left-3 z-10 text-center" />
         <input

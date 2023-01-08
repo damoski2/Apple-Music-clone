@@ -24,3 +24,7 @@ export const millisToMinutesAndSeconds=(millis: number)=> {
   //return new Date(_expiresIn);
  }
   
+
+ export const removeUndefinedFromArray = (arr: any[]) => {
+  return arr.filter((item) => item !== undefined);
+ }

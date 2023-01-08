@@ -2,6 +2,7 @@ import { useEffect, useContext, useMemo, useState } from "react";
 import axios from "axios";
 import { GlobalContext } from "../../context/GlobalContext";
 import { persistTokens, checkPersistedTokens } from "../../services";
+import { loader_types } from "../../types";
 
 const useAuth = (code: string) => {
   const {
@@ -25,7 +26,7 @@ const useAuth = (code: string) => {
 
   useEffect(() => {
     if (typeof code === "string" && code.length > 0) {
-      handleSetLoader(true, dispatch);
+      handleSetLoader({ state: 'load_app', value: true } as { state: loader_types, value: boolean }, dispatch)
       axios
         .post(`/api/login`, {
           code,
@@ -46,7 +47,7 @@ const useAuth = (code: string) => {
           console.error(err);
           handleSetLoader(false, dispatch);
         })
-        .finally(() => handleSetLoader(false, dispatch));
+        .finally(() =>  handleSetLoader({ state: 'not_loading', value: false } as { state: loader_types, value: boolean }, dispatch));
     }
   }, [code]);
 

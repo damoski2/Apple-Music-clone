@@ -4,7 +4,7 @@ import Link from "next/link";
 import AppleLogoDark from "../../assets/images/AppleLogoDark.svg";
 import AppleLogoLight from "../../assets/images/AppleLogoLight.svg"
 import CardRedPlayIcon from "../../assets/images/CradRedPlayIcon.svg";
-import { ArtistPayload } from '../../interface'
+import { ArtistPayload, TrackPayload } from '../../interface'
 import _ from "lodash";
 import { animated, useSpring } from "react-spring";
 import { useScroll } from "react-use-gesture";
@@ -12,7 +12,7 @@ import { useScroll } from "react-use-gesture";
 
 
 interface Props {
-  data: ArtistPayload;
+  data: TrackPayload;
   style?: any
 }
 
@@ -69,7 +69,7 @@ const RegularCard = ({ data, style }: Props) => {
 }
 
   useEffect(()=>{
-    data && getImageLightness(data?.images[1].url,(brightness: any)=>{
+    data && getImageLightness(data?.album?.images[1].url,(brightness: any)=>{
       //console.log(brightness, data.name)
       setImageLightness(brightness)
     })
@@ -81,11 +81,8 @@ const RegularCard = ({ data, style }: Props) => {
 
 
   return (
-    <animated.div className="ml-5 first:ml-0 flex-shrink-0" style={{ ...style }}  >
-      <span className="text-[#ffffffa3] text-[15px] font-normal">
-        Featuring {truncate(data?.name, 16)}
-      </span>
-      <div className="mt-2 rounded-xl relative">
+    <animated.div className="ml-5 flex-shrink-0" style={{ ...style }}  >
+      <div className=" rounded-xl relative">
         <div className="relative w-full">
 
          <Image src={ imageLightness <= 100 ? AppleLogoLight : AppleLogoDark } className="absolute z-20 top-1 left-[70%]" alt="" />
@@ -101,18 +98,21 @@ const RegularCard = ({ data, style }: Props) => {
           />
           <Image
             src={data?.images[0].url}
-            className={`cursor-pointer w-[237px] h-[285px] rounded-xl ${
+            className={`cursor-pointer w-[237px] h-[237px] rounded-xl ${
               current_hover === data?.id ? "brightness-[.7]" : "brightness-100"
             } `}
             alt=""
             width={237}
-            height={285}
+            height={237}
             
             onMouseEnter={() => handleMouseEnter(data?.id)}
             onMouseLeave={handleMouseLeave}
           />
         </div>
       </div>
+      <span className="text-[#ffffffeb] text-[12px] font-normal">
+        {truncate(data?.name, 16)}
+      </span>
     </animated.div>
   );
 };

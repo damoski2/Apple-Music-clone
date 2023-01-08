@@ -19,22 +19,21 @@
 
 
 #loading {
-  background: #ddd;
   border-radius: 30px;
-  height: 180px;
-  margin: -90px 0 0 -90px;
+  height: 50px;
+  margin: -90px 0 0 0;
   position: fixed;
   left: 50%;
   top: 50%;
-  width: 180px;
+  width: 50px;
 }
 
 .bubble {
   border-radius: 4px;
-  height: 30px;
+  height: 8px;
   margin: -15px 0 0 -4px;
   position: absolute;
-  width: 8px;
+  width: 2px;
   -moz-animation-name: fade;
 	-moz-animation-duration: 1.2s;
 	-moz-animation-iteration-count: infinite;

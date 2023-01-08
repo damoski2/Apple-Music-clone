@@ -5,6 +5,8 @@ import useAuth from "./useAuth";
 import { GlobalContext } from "../../context/GlobalContext";
 import SpotifyWebApi from "spotify-web-api-node";
 import { persistTokens, checkPersistedTokens } from "../../services";
+import { loader_types } from "../../types";
+import { removeUndefinedFromArray } from '../../utils'
 
 const spotifyApi = new SpotifyWebApi({
   clientId: "0c064b242e744e0ca6d6dbbc5458c704",
@@ -26,6 +28,8 @@ const PrivateRoute = ({ children, code }: Props) => {
     searchInput,
     accessToken,
     randomArtistSeeds,
+    handleSetLoader,
+    setNewReleasesTracks,
   } = useContext(GlobalContext);
 
   const { isReady, query, pathname } = useRouter();
@@ -89,51 +93,83 @@ const PrivateRoute = ({ children, code }: Props) => {
   useEffect(() => {
     if (!accessToken) return;
 
-    /*   spotifyApi.getAvailableGenreSeeds()
-    .then((data) => {
-      console.log('genre seed', data.body)
-    }) */
-
-    spotifyApi
-      .getCategories({
-        limit: 5,
-        offset: 0,
-        country: "SE",
-        locale: "sv_SE",
-      })
-      .then(
-        (data) => {
-          console.log("categories", data.body);
+    const seriesOfTrackRequests = async () => {
+      handleSetLoader(
+        { state: "load_artists", value: true } as {
+          state: loader_types;
+          value: boolean;
         },
-        (err) => {
-          //console.log("Something went wrong!", err);
-        }
+        dispatch
       );
 
-    spotifyApi
-      .getNewReleases({ limit: 10, offset: 0, country: "US" })
-      .then((data) => {
-        console.log("new release USA", data.body);
-      });
-
-    spotifyApi
-      .getNewReleases({ limit: 10, offset: 0, country: "NG" })
-      .then((data) => {
-        console.log("new release Nigeria", data.body);
-      });
-
-    if (randomArtistSeeds.length > 0) {
       spotifyApi
-        .getArtistRelatedArtists(randomArtistSeeds[0] as string)
+        .getCategories({
+          limit: 5,
+          offset: 0,
+          country: "SE",
+          locale: "sv_SE",
+        })
+        .then(
+          (data) => {
+            console.log("categories", data.body);
+          },
+          (err) => {
+            //console.log("Something went wrong!", err);
+          }
+        );
+
+      let releaseUsa = await spotifyApi
+        .getNewReleases({ limit: 10, offset: 0, country: "US" })
         .then((data) => {
-          console.log("related artist", data.body);
+          //console.log("new release USA", data.body);
+          let innerdata = data.body.albums.items.map(
+            (album: any, index: number) => {
+              if (index < 5) {
+                return album;
+              }
+              return
+            }
+          );
+          return innerdata;
         });
 
-      spotifyApi.getArtists(randomArtistSeeds).then((data) => {
-        console.log("artist", data.body);
-      });
-  
-    }
+      let realeseNigeria = await spotifyApi
+        .getNewReleases({ limit: 10, offset: 0, country: "NG" })
+        .then((data) => {
+          //console.log("new release Nigeria", data.body);
+          let innerdata = data.body.albums.items.map(
+            (album: any, index: number) => {
+              if (index < 5) {
+                return album;
+              }
+              return
+            }
+          );
+          return innerdata;
+        });
+
+      if (randomArtistSeeds.length > 0) {
+        spotifyApi
+          .getArtistRelatedArtists(randomArtistSeeds[0] as string)
+          .then((data) => {
+            console.log("related artist", data.body);
+          });
+      }
+
+      let totalRelease = removeUndefinedFromArray([...realeseNigeria, ...releaseUsa]);
+
+      
+      handleSetLoader(
+        { state: "not_loading", value: false } as {
+          state: loader_types;
+          value: boolean;
+        },
+        dispatch
+      );
+      setNewReleasesTracks(totalRelease, dispatch);
+    };
+
+    seriesOfTrackRequests();
   }, [accessToken, randomArtistSeeds]);
 
   useAuth(query.code as string);
