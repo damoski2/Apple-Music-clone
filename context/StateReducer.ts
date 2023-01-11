@@ -135,6 +135,12 @@ export default (state: any, action: any)=>{
                 newReleaseTracks: payload
             }
 
+        case 'SET_CURRENT_ARTIST':
+            return{
+                ...state,
+                currentArtist: payload
+            }
+
         case 'LOG_OUT':
             return{
                 ...state,

@@ -1,1 +1,1 @@
-export type loader_types = 'not_loading' | 'load_playlist' | 'load_song' | 'load_artists' | 'load_genre' | 'load_app'
+export type loader_types = 'not_loading' | 'load_playlist' | 'load_song' | 'load_artists' | 'load_genre' | 'load_app' | 'load_artist'

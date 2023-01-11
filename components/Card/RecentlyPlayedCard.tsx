@@ -1,26 +1,27 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import AppleLogoDark from "../../assets/images/AppleLogoDark.svg";
-import AppleLogoLight from "../../assets/images/AppleLogoLight.svg"
+import AppleLogoLight from "../../assets/images/AppleLogoLight.svg";
 import CardRedPlayIcon from "../../assets/images/CradRedPlayIcon.svg";
-import { ArtistPayload, TrackPayload } from '../../interface'
+import { ArtistPayload, TrackPayload } from "../../interface";
 import _ from "lodash";
 import { animated, useSpring } from "react-spring";
 import { useScroll } from "react-use-gesture";
-
-
+import { GlobalContext } from "../../context/GlobalContext";
 
 interface Props {
   data: TrackPayload;
-  style?: any
+  style?: any;
 }
 
 const truncate = (str: string, n: number) => {
   return str?.length > n ? str.substr(0, n - 1) + "..." : str;
-}
+};
 
 const RegularCard = ({ data, style }: Props) => {
+  const { dispatch, setCurrentSong } = useContext(GlobalContext);
+
   const [current_hover, set_Current_Hover] = useState<string>("");
   const [imageLightness, setImageLightness] = useState<number>(0);
 
@@ -32,7 +33,7 @@ const RegularCard = ({ data, style }: Props) => {
     set_Current_Hover("");
   };
 
-  function getImageLightness(imageSrc: any,callback: (arg0: any)=>void) {
+  function getImageLightness(imageSrc: any, callback: (arg0: any) => void) {
     var img = document.createElement("img");
     img.src = imageSrc;
     img.style.display = "none";
@@ -41,51 +42,58 @@ const RegularCard = ({ data, style }: Props) => {
 
     var colorSum = 0;
 
-    img.onload = function() {
-        // create canvas
-        var canvas = document.createElement("canvas");
-        canvas.width = img.width;
-        canvas.height = img.height;
+    img.onload = function () {
+      // create canvas
+      var canvas = document.createElement("canvas");
+      canvas.width = img.width;
+      canvas.height = img.height;
 
-        var ctx = canvas.getContext("2d");
-        ctx!.drawImage(img,0,0);
+      var ctx = canvas.getContext("2d");
+      ctx!.drawImage(img, 0, 0);
 
-        var imageData = ctx!.getImageData(0,0,canvas.width,canvas.height);
-        var data = imageData.data;
-        var r,g,b,avg;
+      var imageData = ctx!.getImageData(0, 0, canvas.width, canvas.height);
+      var data = imageData.data;
+      var r, g, b, avg;
 
-        for(var x = 0, len = data.length; x < len; x+=4) {
-            r = data[x];
-            g = data[x+1];
-            b = data[x+2];
+      for (var x = 0, len = data.length; x < len; x += 4) {
+        r = data[x];
+        g = data[x + 1];
+        b = data[x + 2];
 
-            avg = Math.floor((r+g+b)/3);
-            colorSum += avg;
-        }
+        avg = Math.floor((r + g + b) / 3);
+        colorSum += avg;
+      }
 
-        var brightness = Math.floor(colorSum / (img.width*img.height));
-        callback(brightness);
-    }
-}
+      var brightness = Math.floor(colorSum / (img.width * img.height));
+      callback(brightness);
+    };
+  }
 
-  useEffect(()=>{
-    data && getImageLightness(data?.album?.images[1].url,(brightness: any)=>{
-      //console.log(brightness, data.name)
-      setImageLightness(brightness)
-    })
-  },[data])
-
-
-
-
-
+  useEffect(() => {
+    data &&
+      getImageLightness(data?.album?.images[1].url, (brightness: any) => {
+        //console.log(brightness, data.name)
+        setImageLightness(brightness);
+      });
+  }, [data]);
 
   return (
-    <animated.div className="ml-5 first:ml-0 flex-shrink-0" style={{ ...style }}  >
+    <animated.div
+      onClick={() => {
+        dispatch({
+          type: "SET_CURRENT_PLAYLIST_TRACKS_URI",
+          payload: [data?.uri],
+        });
+      }}
+      className="ml-5 first:ml-0 flex-shrink-0"
+      style={{ ...style }}>
       <div className="mt-1 rounded-xl relative">
         <div className="relative w-full">
-
-         <Image src={ imageLightness <= 100 ? AppleLogoLight : AppleLogoDark } className="absolute z-20 top-1 left-[70%]" alt="" />
+          <Image
+            src={imageLightness <= 100 ? AppleLogoLight : AppleLogoDark}
+            className="absolute z-20 top-1 left-[70%]"
+            alt=""
+          />
 
           <Image
             src={CardRedPlayIcon}
@@ -104,7 +112,6 @@ const RegularCard = ({ data, style }: Props) => {
             alt=""
             width={237}
             height={237}
-            
             onMouseEnter={() => handleMouseEnter(data?.id)}
             onMouseLeave={handleMouseLeave}
           />

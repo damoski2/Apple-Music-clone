@@ -84,3 +84,11 @@ export const setNewReleasesTracks = (data: any, dispatch: Dispatch<DispatchType>
         payload: data
     })
 }
+
+export const setCurrentArtist = (data: any, dispatch: Dispatch<DispatchType>)=>{
+    Router.push(`/artists/${data.id}`)
+    dispatch({
+        type: 'SET_CURRENT_ARTIST',
+        payload: data
+    })
+}

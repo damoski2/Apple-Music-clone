@@ -25,20 +25,76 @@ export default function Home() {
     setRecentlyPlayedTracks,
     recentlyPlayedTracks,
     newReleaseTracks,
+    playlists,
     dispatch,
   } = useContext(GlobalContext);
 
   useEffect(() => {
     if (!accessToken) return;
-
     spotifyApi.setAccessToken(accessToken);
 
-    spotifyApi
-      .getMyRecentlyPlayedTracks({ limit: 10, after: 0 })
-      .then((data) => {
-        setRecentlyPlayedTracks(data.body.items, dispatch);
+    const entryRequest = async () => {
+      let artistsLists: any = [];
+
+      await dispatch({
+        type: "LOADING_PAGE",
+        payload: {
+          state: "load_artists",
+          value: true,
+        } as {
+          state: loader_types;
+          value: boolean;
+        },
       });
-  }, [accessToken]);
+
+      if (playlists.length > 0) {
+        while (artistsLists.length < 10) {
+          let random: number = Math.floor(Math.random() * playlists.length);
+          let _artistId: any = await spotifyApi
+            .getPlaylistTracks(playlists[random].id)
+            .then((data) => {
+              let tracks: any = data.body.items;
+              random = Math.floor(Math.random() * tracks.length);
+
+              return tracks[random].track.artists[0].id;
+            });
+          artistsLists.includes(_artistId)
+            ? null
+            : artistsLists.push(_artistId);
+        }
+
+        artistsLists = await spotifyApi
+          .getArtists(artistsLists)
+          .then((data) => {
+            return data.body.artists;
+          });
+
+        spotifyApi
+          .getMyRecentlyPlayedTracks({ limit: 10, after: 0 })
+          .then((data) => {
+            setRecentlyPlayedTracks(data.body.items, dispatch);
+          });
+
+        await dispatch({
+          type: "SET_ARTISTS_LISTS",
+          payload: artistsLists,
+        });
+      }
+
+      await dispatch({
+        type: "LOADING_PAGE",
+        payload: {
+          state: "not_loading",
+          value: false,
+        } as {
+          state: loader_types;
+          value: boolean;
+        },
+      });
+    };
+
+    entryRequest();
+  }, [accessToken, playlists]);
 
   const clamp = (value: number, clampAt: number = 30) => {
     if (value > 0) {
@@ -154,21 +210,17 @@ export default function Home() {
               <div className="box"></div>
             </div>
 
-            <div
-            className="flex flex-row w-full overflow-scroll "
-            {...bind3()}>
-            {newReleaseTracks &&
-              newReleaseTracks.map((song: any, index: number) => (
-                <NewReleaseCard
-                  data={song as TrackPayload}
-                  key={index}
-                  style={style3}
-                />
-              ))}
+            <div className="flex flex-row w-full overflow-scroll " {...bind3()}>
+              {newReleaseTracks &&
+                newReleaseTracks.map((song: any, index: number) => (
+                  <NewReleaseCard
+                    data={song as TrackPayload}
+                    key={index}
+                    style={style3}
+                  />
+                ))}
+            </div>
           </div>
-          </div>
-
-          
         </div>
       </Layout>
     </PrivateRoute>

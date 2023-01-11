@@ -18,7 +18,8 @@ import {
   setPrevSong,
   setNewReleases,
   setRecentlyPlayedTracks,
-  setNewReleasesTracks
+  setNewReleasesTracks,
+  setCurrentArtist
 } from "./action";
 import { checkPersistedTokens } from "../services";
 import SpotifyWebApi from "spotify-web-api-node";
@@ -56,7 +57,8 @@ const initialState: any = {
   recentlyPlayedTracks: [],
   randomArtistSeeds: [],
   artistsLists: [],
-  newReleaseTracks: []
+  newReleaseTracks: [],
+  currentArtist: null,
 };
 
 export const GlobalContext = createContext(initialState);
@@ -164,38 +166,10 @@ export const GlobalProvider = ({ children }: Props) => {
             return tracks[random2].track.artists[0].id;
           });
 
-        while (artistsLists.length < 10) {
-          let random: number = Math.floor(
-            Math.random() * state.playlists.length
-          );
-          let _artistId: any = await spotifyApi
-            .getPlaylistTracks(state.playlists[random].id)
-            .then((data) => {
-              let tracks: any = data.body.items;
-              random = Math.floor(Math.random() * tracks.length);
-
-              return tracks[random].track.artists[0].id;
-            });
-          artistsLists.includes(_artistId)
-            ? null
-            : artistsLists.push(_artistId);
-        }
-
-        artistsLists = await spotifyApi
-          .getArtists(artistsLists)
-          .then((data) => {
-            //console.log('artists...',data.body.artists)
-            return data.body.artists;
-          });
 
         await dispatch({
           type: "SET_RANDOM_ARTIST_SEEDS",
           payload: [_artistId1, _artsisId2],
-        });
-
-        await dispatch({
-          type: "SET_ARTISTS_LISTS",
-          payload: artistsLists,
         });
 
         await dispatch({
@@ -230,6 +204,7 @@ export const GlobalProvider = ({ children }: Props) => {
         setNewReleases,
         setRecentlyPlayedTracks,
         setNewReleasesTracks,
+        setCurrentArtist,
         dispatch,
       }}>
       {children}

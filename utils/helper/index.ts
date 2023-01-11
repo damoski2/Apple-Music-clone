@@ -28,3 +28,7 @@ export const millisToMinutesAndSeconds=(millis: number)=> {
  export const removeUndefinedFromArray = (arr: any[]) => {
   return arr.filter((item) => item !== undefined);
  }
+
+ export const stringShortener = (str: string, length: number) => {
+  return str.length > length ? str.substring(0, length) + "..." : str;
+ }
