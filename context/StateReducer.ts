@@ -78,7 +78,7 @@ export default (state: any, action: any)=>{
         case 'SET_CURRENT_PLAYLIST_TRACKS_URI':
             return{
                 ...state,
-                currentPlaylistTracksUri: payload
+                currentPlaylistOrAlbumTracksUri: payload
             }
 
         case 'SET_CURRENT_SONG':
@@ -139,6 +139,18 @@ export default (state: any, action: any)=>{
             return{
                 ...state,
                 currentArtist: payload
+            }
+
+        case 'SET_CURRENT_ALBUM':
+            return{
+                ...state,
+                currentAlbum: payload
+            }
+
+        case 'SET_CURRENT_ALBUM_TRACKS_URI':
+            return{
+                ...state,
+                currentPlaylistOrAlbumTracksUri: payload
             }
 
         case 'LOG_OUT':

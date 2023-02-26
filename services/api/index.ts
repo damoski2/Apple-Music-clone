@@ -13,6 +13,7 @@ export const persistTokens = (_tokenType: string, token: any)=>{
 
         case 'SET_EXPIRES_IN':
             let _expiresIn: any = millsecondstoISODateconverter(token)
+            console.log('expires in', _expiresIn)
             localStorage.setItem('expiresIn', _expiresIn)
             break;
 

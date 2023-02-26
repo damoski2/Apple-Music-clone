@@ -1,4 +1,5 @@
 import React, { useContext, useEffect } from "react";
+import Link from "next/link";
 import Image from "next/image";
 import { GlobalContext } from "../../context/GlobalContext";
 import { Divider } from "antd";
@@ -16,7 +17,7 @@ const SearchResultModal = () => {
   };
 
   return (
-    <div className="fixed rounded-md w-[302px] max-h-[695px] p-[6px] h-fit bg-[#342250] z-20 bg-opacity-40 bg-clip-padding backdrop-blur-lg top-[100px] left-6 border-[.1px] border-[#fff] overflow-scroll text-[#fff] ">
+    <div className="absolute rounded-md w-[302px] max-h-[695px] p-[6px] h-fit bg-[#342250] z-50 bg-opacity-40 bg-clip-padding backdrop-blur-lg top-[100px] left-6 border-[.1px] border-[#fff] overflow-scroll text-[#fff] ">
       <ul>
         {searchResults?.map((result: any, index: number) => (
           <>
@@ -30,8 +31,8 @@ const SearchResultModal = () => {
               <Image src={result?.albumUrl} alt="" width={46} height={46} />
               <div className="flex flex-col ml-2">
                 <span className="text-white text-[13px]">{result?.title}</span>
-                <span className="text-xs text-[#BFBFBF] font-normal">
-                  Song . {result?.artist}
+                <span  className="text-xs text-[#BFBFBF] font-normal">
+                  Song . <Link href={`/artists/${result.artistId}`} ><span>{result?.artist}</span></Link>
                 </span>
               </div>
             </li>

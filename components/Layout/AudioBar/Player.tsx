@@ -1,10 +1,10 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import Image from 'next/image'
 import PrevButton from '../../../assets/images/PrevInactiveIcon.svg'
 import NextButton from '../../../assets/images/NextInactiveIcon.svg'
 import PlayButton from '../../../assets/images/PlayIcon.svg'
 import PauseButton from '../../../assets/images/PauseIcon.svg'
-
+import { GlobalContext } from '../../../context/GlobalContext'
 
 
 interface Props{
@@ -17,6 +17,10 @@ interface Props{
 }
 
 const Player = ({ audioElem, isPlaying, setIsPlaying, currentSong, setCurrentSong, songs }: Props) => {
+
+    const { dispatch } = useContext(GlobalContext)
+
+
   return (
     <div className="player_container" >
         <div className="controls" >

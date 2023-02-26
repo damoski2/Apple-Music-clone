@@ -24,12 +24,9 @@ const PrivateRoute = ({ children, code }: Props) => {
   const {
     dispatch,
     auth_code,
-    setGlobalSearchResult,
-    searchInput,
     accessToken,
     randomArtistSeeds,
     handleSetLoader,
-    setNewReleasesTracks,
   } = useContext(GlobalContext);
 
   const { isReady, query, pathname } = useRouter();
@@ -55,40 +52,6 @@ const PrivateRoute = ({ children, code }: Props) => {
     }
   }, [isReady, auth_code]);
 
-  useEffect(() => {
-    if (!searchInput) return setGlobalSearchResult([], dispatch);
-    if (!accessToken) return;
-    let cancel: boolean = false;
-    spotifyApi
-      .searchTracks(searchInput)
-      .then((data) => {
-        if (cancel) return;
-        //console.log(data?.body?.tracks?.items)
-        let formattedData = data?.body?.tracks?.items?.map((track: any) => {
-          const smallestAlbumImage = track.album.images.reduce(
-            (smallest: any, image: any) => {
-              if (image.height < smallest.height) return image;
-              return smallest;
-            },
-            track.album.images[0]
-          );
-
-          return {
-            artist: track.artists[0].name,
-            title: track.name,
-            uri: track.uri,
-            albumUrl: smallestAlbumImage.url,
-          };
-        });
-        //console.log(formattedData);
-        setGlobalSearchResult(formattedData, dispatch);
-      })
-      .catch((err) => {
-        //console.log(err)
-      });
-
-    return () => (cancel = true);
-  }, [searchInput, accessToken]);
 
   useEffect(() => {
     if (!accessToken) return;
@@ -111,52 +74,22 @@ const PrivateRoute = ({ children, code }: Props) => {
         })
         .then(
           (data) => {
-            console.log("categories", data.body);
+            //console.log("categories", data.body);
           },
           (err) => {
             //console.log("Something went wrong!", err);
           }
         );
 
-      let releaseUsa = await spotifyApi
-        .getNewReleases({ limit: 10, offset: 0, country: "US" })
-        .then((data) => {
-          //console.log("new release USA", data.body);
-          let innerdata = data.body.albums.items.map(
-            (album: any, index: number) => {
-              if (index < 5) {
-                return album;
-              }
-              return
-            }
-          );
-          return innerdata;
-        });
-
-      let realeseNigeria = await spotifyApi
-        .getNewReleases({ limit: 10, offset: 0, country: "NG" })
-        .then((data) => {
-          //console.log("new release Nigeria", data.body);
-          let innerdata = data.body.albums.items.map(
-            (album: any, index: number) => {
-              if (index < 5) {
-                return album;
-              }
-              return
-            }
-          );
-          return innerdata;
-        });
-
       if (randomArtistSeeds.length > 0) {
         spotifyApi
           .getArtistRelatedArtists(randomArtistSeeds[0] as string)
           .then((data) => {
-            console.log("related artist", data.body);
+            //console.log("related artist", data.body);
           });
       }
 
-      let totalRelease = removeUndefinedFromArray([...realeseNigeria, ...releaseUsa]);
+      
 
       
       handleSetLoader(
@@ -166,7 +99,7 @@ const PrivateRoute = ({ children, code }: Props) => {
         },
         dispatch
       );
-      setNewReleasesTracks(totalRelease, dispatch);
+     
     };
 
     seriesOfTrackRequests();

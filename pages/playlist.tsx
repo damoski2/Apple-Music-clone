@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
+import Link from 'next/link'
 import { useRouter } from "next/router";
 import { Layout } from "../components/import";
 import StyledTable from '../components/Table'
@@ -47,6 +48,7 @@ const Playlist = () => {
   };
 
   const findSongIndex = (elem: any) => elem.id === currentId;
+  const shuffleArray = (arr: string[]) => arr.sort(() => Math.random() - 0.5);
 
   const handleSetCurrentSong = (index: any) => {
     let _idx = currentPlaylistTracks.findIndex(findSongIndex);
@@ -59,7 +61,9 @@ const Playlist = () => {
 
   };
 
-  const resetCurrentPlaylistTrack = (_songIndex: number) => {
+  
+
+  const resetCurrentPlaylistTrack = (_songIndex: number, shuffle: boolean = false) => {
     currentPlaylistTracks.forEach((track: any, index: number) => {
       let _len: number;
 
@@ -84,6 +88,7 @@ const Playlist = () => {
       index === currentPlaylistTracks.length - 1 &&
         (() => {
           //console.log("newTrack", newTrack);
+          shuffle === true && (newTrack = shuffleArray(newTrack));
           dispatch({
             type: "SET_CURRENT_PLAYLIST_TRACKS_URI",
             payload: newTrack,
@@ -132,6 +137,7 @@ const Playlist = () => {
             preview_image: track.track.album.images[0].url,
           },
           artist: track.track.artists[0].name,
+          artistId: track.track.artists[0].id,
           album: track.track.album.name,
           time: millisToMinutesAndSeconds(Number(track.track.duration_ms)),
           href: track.track.href,
@@ -149,6 +155,24 @@ const Playlist = () => {
     handleSetLoader({ state: 'not_loading', value: false } as { state: loader_types, value: boolean }, dispatch)
   }, [accessToken, isReady, query]);
 
+  useEffect(()=>{
+    if(currentPlaylistTracks.length === 0) return
+    currentId = currentPlaylistTracks[0].id;
+    let _idx = currentPlaylistTracks.findIndex(findSongIndex);
+    let _currentSong = currentPlaylistTracks[_idx];
+    setCurrentSong(_currentSong, dispatch);
+    setNextSong(currentPlaylistTracks[_idx + 1], dispatch);
+    setPrevSong(currentPlaylistTracks[_idx - 1], dispatch);
+  },[currentPlaylistTracks]);
+
+  const handlePlaylistPlay = ()=>{
+    resetCurrentPlaylistTrack(0)
+  }
+
+  const handlePlaylistShuffle = ()=>{
+    resetCurrentPlaylistTrack(0, true)
+  }
+
   const columns = [
     {
       title: "Song",
@@ -158,7 +182,6 @@ const Playlist = () => {
       render: (data: any, index: any) => (
         <div
           onClick={() => {
-
             currentId = index.id;
             handleSetCurrentSong(index);
           }}
@@ -190,6 +213,11 @@ const Playlist = () => {
       title: "Artist",
       dataIndex: "artist",
       key: "artist",
+      render: (data: any, index: any) => (
+        <Link href={`/artists/${index.artistId}`} >
+          <p className="cursor-pointer" >{index.artist}</p>
+        </Link>
+      ),
     },
     {
       title: "Album",
@@ -232,11 +260,11 @@ const Playlist = () => {
               </p>
 
               <div className="flex flex-row w-full mt-16">
-                <button className="bg-[#d60017] rounded-[6px] h-7 px-3 text-white flex flex-row justify-center items-center w-[124px] text-xs">
+                <button onClick={handlePlaylistPlay} className="bg-[#d60017] rounded-[6px] h-7 px-3 text-white flex flex-row justify-center items-center w-[124px] text-xs">
                   <Image src={PlayWhiteIcon} alt="" />{" "}
                   <span className="ml-2">Play</span>
                 </button>
-                <button className="bg-[#d60017] rounded-[6px] h-7 px-3 text-white flex flex-row justify-center items-center w-[124px] text-xs ml-2.5">
+                <button onClick={handlePlaylistShuffle} className="bg-[#d60017] rounded-[6px] h-7 px-3 text-white flex flex-row justify-center items-center w-[124px] text-xs ml-2.5">
                   <Image src={ShufffleWhiteIcon} alt="" />
                   <span className="ml-2">Shuffle</span>
                 </button>

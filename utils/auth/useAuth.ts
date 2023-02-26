@@ -33,6 +33,7 @@ const useAuth = (code: string) => {
         })
         .then((res) => {
           //Set in Context
+          console.log(res.data)
           setTokenSession(res.data, dispatch, "SET_ACCESS_TOKEN");
           setTokenSession(res.data, dispatch, "SET_REFRESH_TOKEN");
           setTokenSession(res.data, dispatch, "SET_EXPIRES_IN");

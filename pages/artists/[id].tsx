@@ -7,12 +7,13 @@ import { Layout } from "../../components/import";
 import SpotifyWebApi from "spotify-web-api-node";
 import { loader_types } from "../../types";
 import { Divider } from "antd";
-import { AlbumPayload } from "../../interface";
+import { AlbumPayload, ArtistPayload } from "../../interface";
 import AlbumCard from "../../components/Card/AlbumCard";
 
 import ArtsistPlayIcon from "../../assets/images/CradRedPlayIcon.svg";
 import ArrowRightIcon from "../../assets/images/ArrowRight.svg";
 import PlayListThreeDotIcon from "../../assets/images/PlayListThreeDotIcon.svg";
+import PlayWhiteIcon from "../../assets/images/PlayWhiteIcon.svg";
 
 const spotifyApi = new SpotifyWebApi({
   clientId: "0c064b242e744e0ca6d6dbbc5458c704",
@@ -21,7 +22,7 @@ const spotifyApi = new SpotifyWebApi({
 const Index = () => {
   const router = useRouter();
   const { id } = router.query;
-  const { dispatch, currentArtist, accessToken } = useContext(GlobalContext);
+  const { dispatch, accessToken, setCurrentArtist } = useContext(GlobalContext);
 
   const [artist, setArtist] = useState<any>({
     artistInfo: null,
@@ -30,6 +31,16 @@ const Index = () => {
     artistRelatedArtist: null,
     artistAbout: null,
   });
+
+  const [current_hover, set_Current_Hover] = useState<string>("");
+
+  const handleMouseEnter = (_id: string): void => {
+    set_Current_Hover(_id);
+  };
+
+  const handleMouseLeave = (): void => {
+    set_Current_Hover("");
+  };
 
   const { artistInfo, artistAlbums, artistRelatedArtist, artistTopTracks } =
     artist;
@@ -99,6 +110,17 @@ const Index = () => {
     getArtist();
   }, [id, accessToken]);
 
+  //console.log(artistTopTracks)
+
+  const handlePlayArtistToptracks = () => {
+    let _trackUri = artistTopTracks.tracks.map((track: any) => track.uri);
+    dispatch({
+      type: "SET_CURRENT_PLAYLIST_TRACKS_URI",
+      payload: _trackUri,
+    });
+    //console.log(_trackUri)
+  };
+
   return (
     <PrivateRoute>
       <Layout>
@@ -109,14 +131,20 @@ const Index = () => {
                 <Image
                   width={190}
                   height={190}
-                  className="rounded-full"
+                  className="rounded-full max-w-[190px] max-h-[190px] w-[190px] h-[190px] "
                   src={artistInfo?.images[0].url}
                   alt=""
                 />
               )}
             </div>
             <div className="mb-[30px] cursor-pointer flex flex-row ">
-              <Image width={46} height={46} src={ArtsistPlayIcon} alt="" />
+              <Image
+                onClick={handlePlayArtistToptracks}
+                width={46}
+                height={46}
+                src={ArtsistPlayIcon}
+                alt=""
+              />
               <h1 className="text-[#ffffffeb] ml-4 font-semibold text-[34px]">
                 {artistInfo?.name}
               </h1>
@@ -136,13 +164,37 @@ const Index = () => {
                   <Divider className="h-[.001px] mt-1 mb-2 bg-[#4D4D4D]" />
                   <div
                     key={index}
-                    className="flex flex-row justify-between items-center">
-                    <div className="flex flex-row">
+                    className="flex flex-row justify-between items-center relative">
+                    <div
+                      onClick={() => {
+                        dispatch({
+                          type: "SET_CURRENT_PLAYLIST_TRACKS_URI",
+                          payload: [track?.uri],
+                        });
+                      }}
+                      className="flex flex-row">
                       <Image
                         width={40}
                         height={40}
                         src={track?.album?.images[0]?.url}
                         alt=""
+                        onMouseEnter={() => handleMouseEnter(track?.id)}
+                        onMouseLeave={handleMouseLeave}
+                        className={`backdrop-blur-sm ${
+                          current_hover === track?.id
+                            ? "brightness-[.3]"
+                            : "brightness-100"
+                        }`}
+                      />
+                      <Image
+                        src={PlayWhiteIcon}
+                        alt=""
+                        onMouseEnter={() => handleMouseEnter(track?.id)}
+                        className={`absolute top-3.5 left-4 ${
+                          current_hover === track?.id
+                            ? "opacity-100"
+                            : "opacity-0"
+                        }`}
                       />
                       <div className="items-start ml-4 ">
                         <p className="text-[13px] text-[#ffffffeb] font-normal">
@@ -154,18 +206,63 @@ const Index = () => {
                         </span>
                       </div>
                     </div>
-                    <Image src={PlayListThreeDotIcon} alt="" />
+                    <Image
+                      src={PlayListThreeDotIcon}
+                      className="cursor-pointer"
+                      alt=""
+                    />
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="bg-[#1f1f1f] px-10 pt-[52px] pb-7" >
+          <div className="bg-[#1f1f1f] px-10 pt-[52px] pb-7">
             <div className="flex flex-row">
               <h2 className="mr-2 text-[#ffffffeb] text-[17px] font-medium">
                 Albums
               </h2>
+            </div>
+
+            <div className="flex flex-row w-full overflow-scroll py-4">
+              {artistAlbums?.items &&
+                artistAlbums?.items.map(
+                  (album: AlbumPayload, index: number) => (
+                    <AlbumCard data={album as AlbumPayload} key={index} />
+                  )
+                )}
+            </div>
+          </div>
+
+          <div className="bg-[#323232] px-10 pt-[52px] pb-7">
+            <div className="flex flex-row">
+              <h2 className="mr-2 text-[#ffffffeb] text-[17px] font-medium">
+                Similar Artists
+              </h2>
+              <Image src={ArrowRightIcon} alt="" />
+            </div>
+
+            <div className="flex flex-row justify-between w-full overflow-scroll py-4 ">
+              {artistRelatedArtist?.artists &&
+                artistRelatedArtist?.artists
+                  .slice(0, 11)
+                  .map((artist: ArtistPayload, index: number) => (
+                    <div
+                      onClick={() => setCurrentArtist(artist, dispatch)}
+                      key={index}
+                      className="flex flex-col items-center mr-[15px] cursor-pointer">
+                      <Image
+                        width={108.75}
+                        height={108.75}
+                        className="rounded-full max-h-[108.75px] h-[108.75px] max-w-[108.75px] w-[108.75px]"
+                        src={artist?.images[1]?.url}
+                        alt=""
+                      />
+                      <span className="mt-2 text-xs font-normal text-[#ffffffeb]">
+                        {stringShortener(artist?.name, 14)}
+                      </span>
+                    </div>
+                  ))}
             </div>
           </div>
         </main>

@@ -20,7 +20,7 @@ const truncate = (str: string, n: number) => {
 };
 
 const RegularCard = ({ data, style }: Props) => {
-  const { dispatch } = useContext(GlobalContext);
+  const { dispatch, setCurrentAlbum } = useContext(GlobalContext);
 
   const [current_hover, set_Current_Hover] = useState<string>("");
   const [imageLightness, setImageLightness] = useState<number>(0);
@@ -33,68 +33,17 @@ const RegularCard = ({ data, style }: Props) => {
     set_Current_Hover("");
   };
 
-  function getImageLightness(imageSrc: any, callback: (arg0: any) => void) {
-    var img = document.createElement("img");
-    img.src = imageSrc;
-    img.style.display = "none";
-    img.crossOrigin = "Anonymous";
-    document.body.appendChild(img);
-
-    var colorSum = 0;
-
-    img.onload = function () {
-      // create canvas
-      var canvas = document.createElement("canvas");
-      canvas.width = img.width;
-      canvas.height = img.height;
-
-      var ctx = canvas.getContext("2d");
-      ctx!.drawImage(img, 0, 0);
-
-      var imageData = ctx!.getImageData(0, 0, canvas.width, canvas.height);
-      var data = imageData.data;
-      var r, g, b, avg;
-
-      for (var x = 0, len = data.length; x < len; x += 4) {
-        r = data[x];
-        g = data[x + 1];
-        b = data[x + 2];
-
-        avg = Math.floor((r + g + b) / 3);
-        colorSum += avg;
-      }
-
-      var brightness = Math.floor(colorSum / (img.width * img.height));
-      callback(brightness);
-    };
-  }
-
-  useEffect(() => {
-    data &&
-      getImageLightness(data?.album?.images[1].url, (brightness: any) => {
-        //console.log(brightness, data.name)
-        setImageLightness(brightness);
-      });
-  }, [data]);
 
   return (
-    <animated.div
+    <div
       onClick={() => {
-       /*  dispatch({
-          type: "SET_CURRENT_PLAYLIST_TRACKS_URI",
-          payload: [data?.uri],
-        }); */
+        setCurrentAlbum(data, dispatch);
       }}
       className="ml-5 first:ml-0 flex-shrink-0"
       style={{ ...style }}>
       <div className="mt-1 rounded-xl relative">
         <div className="relative w-full">
-          <Image
-            src={imageLightness <= 100 ? AppleLogoLight : AppleLogoDark}
-            className="absolute z-20 top-1 left-[70%]"
-            alt=""
-          />
-
+          
           <Image
             src={CardRedPlayIcon}
             alt=""
@@ -118,9 +67,9 @@ const RegularCard = ({ data, style }: Props) => {
         </div>
       </div>
       <span className="text-[#ffffffeb] text-[12px] font-normal">
-        {truncate(data?.name, 16)}
+        {truncate(data?.name, 36)}
       </span>
-    </animated.div>
+    </div>
   );
 };
 

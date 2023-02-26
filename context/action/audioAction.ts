@@ -92,3 +92,11 @@ export const setCurrentArtist = (data: any, dispatch: Dispatch<DispatchType>)=>{
         payload: data
     })
 }
+
+export const setCurrentAlbum = (data: any, dispatch: Dispatch<DispatchType>)=>{
+    Router.push(`/albums/${data.id}`)
+    dispatch({
+        type: 'SET_CURRENT_ALBUM',
+        payload: data
+    })
+}

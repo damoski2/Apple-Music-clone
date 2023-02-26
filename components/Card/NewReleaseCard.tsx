@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import AppleLogoDark from "../../assets/images/AppleLogoDark.svg";
 import AppleLogoLight from "../../assets/images/AppleLogoLight.svg"
 import CardRedPlayIcon from "../../assets/images/CradRedPlayIcon.svg";
-import { ArtistPayload, TrackPayload } from '../../interface'
+import { AlbumPayload } from '../../interface'
 import _ from "lodash";
-import { animated, useSpring } from "react-spring";
-import { useScroll } from "react-use-gesture";
+import { animated } from "react-spring";
+import { GlobalContext } from '../../context/GlobalContext'
 
 
 
 interface Props {
-  data: TrackPayload;
+  data: AlbumPayload;
   style?: any
 }
 
@@ -21,6 +21,9 @@ const truncate = (str: string, n: number) => {
 }
 
 const RegularCard = ({ data, style }: Props) => {
+
+  const { dispatch } = useContext(GlobalContext);
+
   const [current_hover, set_Current_Hover] = useState<string>("");
   const [imageLightness, setImageLightness] = useState<number>(0);
 
@@ -69,23 +72,28 @@ const RegularCard = ({ data, style }: Props) => {
 }
 
   useEffect(()=>{
-    data && getImageLightness(data?.album?.images[1].url,(brightness: any)=>{
+    data && getImageLightness(data?.images[1].url,(brightness: any)=>{
       //console.log(brightness, data.name)
       setImageLightness(brightness)
     })
   },[data])
 
-
-
-
+  //console.log(data)
 
 
   return (
-    <animated.div className="ml-5 flex-shrink-0" style={{ ...style }}  >
+    <animated.div
+    onClick={() => {
+      dispatch({
+        type: "SET_CURRENT_PLAYLIST_TRACKS_URI",
+        payload: [data?.uri],
+      });
+    }}
+    className="ml-5 flex-shrink-0" style={{ ...style }}  >
       <div className=" rounded-xl relative">
         <div className="relative w-full">
 
-         <Image src={ imageLightness <= 100 ? AppleLogoLight : AppleLogoDark } className="absolute z-20 top-1 left-[70%]" alt="" />
+        <Image src={ imageLightness <= 100 ? AppleLogoLight : AppleLogoDark } className="absolute z-20 top-1 left-[70%]" alt="" />
 
           <Image
             src={CardRedPlayIcon}

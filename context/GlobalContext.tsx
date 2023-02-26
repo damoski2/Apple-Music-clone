@@ -19,7 +19,8 @@ import {
   setNewReleases,
   setRecentlyPlayedTracks,
   setNewReleasesTracks,
-  setCurrentArtist
+  setCurrentArtist,
+  setCurrentAlbum
 } from "./action";
 import { checkPersistedTokens } from "../services";
 import SpotifyWebApi from "spotify-web-api-node";
@@ -48,7 +49,7 @@ const initialState: any = {
   playlists: [],
   currentPlaylist: null,
   currentPlaylistTracks: [],
-  currentPlaylistTracksUri: [],
+  currentPlaylistOrAlbumTracksUri: [],
   currentSong: null,
   prevSong: null,
   nextSong: null,
@@ -59,6 +60,7 @@ const initialState: any = {
   artistsLists: [],
   newReleaseTracks: [],
   currentArtist: null,
+  currentAlbum: null
 };
 
 export const GlobalContext = createContext(initialState);
@@ -111,16 +113,16 @@ export const GlobalProvider = ({ children }: Props) => {
     spotifyApi.setAccessToken(state.accessToken);
   }, [state.accessToken]);
 
-  useEffect(() => {
+ /*  useEffect(() => {
     if (state.currentPlaylistTracks.length > 0) {
       dispatch({
         type: "SET_CURRENT_SONG",
         payload: state.currentPlaylistTracks[state.currentSongIndex],
       });
     }
-  }, [state.currentPlaylistTracks]);
+  }, [state.currentPlaylistTracks]); */
 
-  useEffect(() => {
+ /*  useEffect(() => {
     if (!state.accessToken) return;
     spotifyApi.setAccessToken(state.accessToken);
 
@@ -188,6 +190,9 @@ export const GlobalProvider = ({ children }: Props) => {
     seedRequest();
   }, [state.playlists, state.accessToken]);
 
+ */
+
+
   return (
     <GlobalContext.Provider
       value={{
@@ -205,6 +210,7 @@ export const GlobalProvider = ({ children }: Props) => {
         setRecentlyPlayedTracks,
         setNewReleasesTracks,
         setCurrentArtist,
+        setCurrentAlbum,
         dispatch,
       }}>
       {children}

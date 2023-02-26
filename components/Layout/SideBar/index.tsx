@@ -1,5 +1,5 @@
 import React, { useState, useContext, useRef, useEffect } from "react";
-import { useRouter, NextRouter } from 'next/router'
+import { useRouter, NextRouter } from "next/router";
 import Link from "next/link";
 import Image from "next/image";
 import SearchIcon from "../../../assets/images/SearchIcon.svg";
@@ -7,6 +7,7 @@ import ListenNowIcon from "../../../assets/images/ListenNow.svg";
 import BrowseIcon from "../../../assets/images/BrowseIcon.svg";
 import RadioIcon from "../../../assets/images/Radio.svg";
 import RecentlyAddedIcon from "../../../assets/images/RecentlyAdded.svg";
+import PlayListIcon from "../../../assets/images/PlayListIcon.svg"
 import ArtistIcon from "../../../assets/images/ArtistIcon.svg";
 import AlbumsIcon from "../../../assets/images/Album.svg";
 import SongsIcon from "../../../assets/images/Song.svg";
@@ -38,24 +39,22 @@ const CustomSearch = Styled(Select).attrs({})`
     }
 `;
 
-const Index = () => {
+const Index = ({ refPasser }: { refPasser: React.MutableRefObject<any> }) => {
   const {
     dispatch,
     setGlobalSearchInput,
+    setGlobalSearchResult,
     setCurrentPlayList,
     searchResults,
     searchInput,
     accessToken,
     setPlaylists,
     playlists,
-    auth_code
+    auth_code,
   } = useContext(GlobalContext);
-  const ref = useRef<any>(null);
-  const { query, pathname }: NextRouter = useRouter()
-  const router: NextRouter = useRouter()
 
-
-  const [displaySearchResult, setDisplaySearchResult] = useState<boolean>(false);
+  const { query, pathname }: NextRouter = useRouter();
+  const router: NextRouter = useRouter();
 
   useEffect(() => {
     if (!accessToken) return;
@@ -80,26 +79,40 @@ const Index = () => {
           owner: item.owner,
         };
       });
+      setPlaylists(result, dispatch);
 
       //console.log(result)
-      setPlaylists(result, dispatch);
     });
   }, [accessToken]);
 
-  useEffect(()=>{
-    searchResults && setDisplaySearchResult(true)
-  },[searchResults])
-
   useEffect(() => {
-    const handleClickOutside = (e: any) => {
-      if (ref?.current && !ref?.current?.contains(e.target)) {
-        setTimeout(()=>{
-          setDisplaySearchResult(false)
-        },1000)
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-  }, [ref]);
+    if (!accessToken) return;
+    let cancel: boolean = false;
+    if (!searchInput) return setGlobalSearchResult([], dispatch);
+    spotifyApi.searchTracks(searchInput).then((data) => {
+      if (cancel) return;
+      //console.log(data?.body?.tracks?.items)
+      let formattedData = data?.body?.tracks?.items?.map((track: any) => {
+        const smallestAlbumImage = track.album.images.reduce(
+          (smallest: any, image: any) => {
+            if (image.height < smallest.height) return image;
+            return smallest;
+          },
+          track.album.images[0]
+        );
+
+        return {
+          artist: track.artists[0].name,
+          artistId: track.artists[0].id,
+          title: track.name,
+          uri: track.uri,
+          albumUrl: smallestAlbumImage.url,
+        };
+      });
+      //console.log(formattedData);
+      setGlobalSearchResult(formattedData, dispatch);
+    });
+  }, [searchInput]);
 
   const [active, setActive] = useState<boolean>(true);
   const [value, setValue] = useState<string>("");
@@ -112,78 +125,88 @@ const Index = () => {
 
   const handleSelectTrack = (value: any) => {};
 
+  const returnActive = (
+    value: string,
+    playlistPath: string | null = null
+  ): ReturnType<() => boolean> => {
+    switch (pathname) {
+      case "/":
+        return value === "/";
 
-  const returnActive = (value: string, playlistPath: string | null = null): ReturnType<()=> boolean> => {
-    switch(pathname){
-      case '/':
-        return value === '/'
+      case "/browse":
+        return value === "/browse";
 
-      case '/browse':
-        return value === '/browse'
+      case "/radio":
+        return value === "/radio";
 
-      case '/radio':
-        return value === '/radio'
+      case "/recently-added":
+        return value === "/recently-added";
 
-      case '/recently-added':
-        return value === '/recently-added'
+      case "/artist":
+        return value === "/artist";
 
-      case '/artist':
-        return value === '/artist'
+      case "/albums":
+        return value === "/albums";
 
-      case '/albums':
-        return value === '/albums'
+      case "/songs":
+        return value === "/songs";
 
-      case '/songs':
-        return value === '/songs'
-
-      case '/playlist':
-        return playlistPath === query?.playlist_id
-      
+      case "/playlist":
+        return playlistPath === query?.playlist_id;
 
       default:
-        return false
-
+        return false;
     }
-  }
-
+  };
 
   return (
-    <div className="h-screen fixed max-w-[260px] w-full bg-[#342250] flex flex-col items-center px-[25px] pt-16">
-      <div className="relative w-full flex flex-row items-center" >
-        <Image src={SearchIcon} alt="" className="absolute left-3 z-10 text-center" />
+    <div className="h-screen md:flex md:fixed hidden max-w-[260px] w-full bg-[#342250] flex-col items-center px-[25px] pt-16">
+      <div className="relative w-full flex flex-row items-center">
+        <Image
+          src={SearchIcon}
+          alt=""
+          className="absolute left-3 z-10 text-center"
+        />
         <input
-          ref={ref}
+          ref={refPasser}
           className="bg-opacity-6 0 bg-clip-padding backdrop-blur-lg bg-[#342250] border-[0.01px] h-[28px] text-[#fff] focus:outline-none rounded-[4px] py-[1px] pl-8"
           onChange={handleChange}
           value={searchInput}
         />
       </div>
-      {displaySearchResult && searchResults.length > 0 && <SearchResultModal />}
+      <div className="absolute">
+        {/* {displaySearchResult && searchResults.length > 0 && <SearchResultModal />} */}
+      </div>
       <div className="flex flex-col w-full items-start mt-4">
         <span className="text-[10px] text-[#BFBFBF]">Apple Music</span>
         <ul className="w-full mt-2">
           <li
-            onClick={()=> router.push(`/?code=${auth_code}`)}
+            onClick={() => router.push(`/?code=${auth_code}`)}
             className={`flex w-full cursor-pointer flex-row items-center pl-3 py-1.5 rounded-md ${
-              returnActive(`/`) && "bg-opacity-10 bg-gray-200 bg-opacity-10 bg-gray-200"
+              returnActive(`/`) &&
+              "bg-opacity-10 bg-gray-200 bg-opacity-10 bg-gray-200"
             }`}>
             <div className="w-[20px]">
               <Image src={ListenNowIcon} alt="" />
             </div>
             <span className="ml-2 text-white text-[13px]">Listen Now</span>
           </li>
+          <Link href="/browse">
+            <li
+              className={`flex w-full flex-row cursor-pointer items-center pl-3 py-1.5 rounded-md ${
+                returnActive("/browse") &&
+                "bg-opacity-10 bg-gray-200 bg-[#342250]/10"
+              }`}>
+              <div className="w-[20px]">
+                <Image src={BrowseIcon} alt="" />
+              </div>
+              <span className="ml-2 text-white text-[13px]">Browse</span>
+            </li>
+          </Link>
           <li
             className={`flex w-full flex-row cursor-pointer items-center pl-3 py-1.5 rounded-md ${
-              returnActive('/browse') && "bg-opacity-10 bg-gray-200 bg-[#342250]/10"
-            }`}>
-            <div className="w-[20px]">
-              <Image src={BrowseIcon} alt="" />
-            </div>
-            <span className="ml-2 text-white text-[13px]">Browse</span>
-          </li>
-          <li
-            className={`flex w-full flex-row cursor-pointer items-center pl-3 py-1.5 rounded-md ${
-              returnActive('/radio') && "bg-opacity-10 bg-gray-200 bg-[#342250]/10"
+              returnActive("/radio") &&
+              "bg-opacity-10 bg-gray-200 bg-[#342250]/10"
             }`}>
             <div className="w-[20px]">
               <Image src={RadioIcon} alt="" />
@@ -195,7 +218,8 @@ const Index = () => {
         <ul className="w-full">
           <li
             className={`flex w-full flex-row cursor-pointer items-center pl-3 py-1.5 rounded-md ${
-              returnActive('/recently-added') && "bg-opacity-10 bg-gray-200 bg-[#342250]/10"
+              returnActive("/recently-added") &&
+              "bg-opacity-10 bg-gray-200 bg-[#342250]/10"
             }`}>
             <div className="w-[20px]">
               <Image src={RecentlyAddedIcon} alt="" />
@@ -204,7 +228,8 @@ const Index = () => {
           </li>
           <li
             className={`flex w-full flex-row cursor-pointer items-center pl-3 py-1.5 rounded-md ${
-              returnActive('/artist') && "bg-opacity-10 bg-gray-200 bg-[#342250]/10"
+              returnActive("/artist") &&
+              "bg-opacity-10 bg-gray-200 bg-[#342250]/10"
             }`}>
             <div className="w-[20px]">
               <Image src={ArtistIcon} alt="" />
@@ -213,7 +238,8 @@ const Index = () => {
           </li>
           <li
             className={`flex w-full flex-row cursor-pointer items-center pl-3 py-1.5 rounded-md ${
-              returnActive('/albums') && "bg-opacity-10 bg-gray-200 bg-[#342250]/10"
+              returnActive("/albums") &&
+              "bg-opacity-10 bg-gray-200 bg-[#342250]/10"
             }`}>
             <div className="w-[20px]">
               <Image src={AlbumsIcon} alt="" />
@@ -222,7 +248,8 @@ const Index = () => {
           </li>
           <li
             className={`flex w-full flex-row cursor-pointer items-center pl-3 py-1.5 rounded-md ${
-              returnActive('/songs') && "bg-opacity-10 bg-gray-200 bg-[#342250]/10"
+              returnActive("/songs") &&
+              "bg-opacity-10 bg-gray-200 bg-[#342250]/10"
             }`}>
             <div className="w-[20px]">
               <Image src={SongsIcon} alt="" />
@@ -238,10 +265,11 @@ const Index = () => {
                 onClick={() => setCurrentPlayList(item, dispatch)}
                 key={index}
                 className={`flex w-full flex-row cursor-pointer items-center pl-3 py-1.5 rounded-md ${
-                  returnActive('/playlist', item?.id) && "bg-opacity-10 bg-gray-200"
+                  returnActive("/playlist", item?.id) &&
+                  "bg-opacity-10 bg-gray-200"
                 } cursor-pointer `}>
                 <div className="w-[20px]">
-                  <Image src={RecentlyAddedIcon} alt="" />
+                  <Image src={PlayListIcon} alt="" />
                 </div>
                 <span className="ml-2 text-white text-[13px]">{item.name}</span>
               </li>

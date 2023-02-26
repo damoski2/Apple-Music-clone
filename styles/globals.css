@@ -37,7 +37,7 @@
 }
 
 .main-screen{
-    @apply w-[calc(100vw_-_260px)] flex flex-col bg-[#323232] left-[260px] absolute
+    @apply md:w-[calc(100vw_-_260px)] w-screen flex flex-col bg-[#323232] left-[260px] md:absolute
 }
 
 
