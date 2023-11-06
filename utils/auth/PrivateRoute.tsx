@@ -102,7 +102,7 @@ const PrivateRoute = ({ children, code }: Props) => {
      
     };
 
-    seriesOfTrackRequests();
+    //seriesOfTrackRequests();
   }, [accessToken, randomArtistSeeds]);
 
   useAuth(query.code as string);

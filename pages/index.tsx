@@ -13,6 +13,7 @@ import { ArtistPayload, TrackPayload, AlbumPayload } from "../interface";
 import { animated, useSpring } from "react-spring";
 import { useScroll } from "react-use-gesture";
 import SpotifyWebApi from "spotify-web-api-node";
+import { loader_types } from "../types";
 
 const spotifyApi = new SpotifyWebApi({
   clientId: "0c064b242e744e0ca6d6dbbc5458c704",
@@ -58,14 +59,14 @@ export default function Home() {
               let tracks: any = data.body.items;
               random = Math.floor(Math.random() * tracks.length);
 
-              return tracks[random].track.artists[0].id;
+              return tracks[random]?.track?.artists[0].id;
             });
           artistsLists.includes(_artistId)
             ? null
             : artistsLists.push(_artistId);
         }
 
-        artistsLists = ["0n3cDqJ0hORbjIRGhdW2bI", ...artistsLists]
+        artistsLists = ["0n3cDqJ0hORbjIRGhdW2bI", ...artistsLists];
 
         artistsLists = await spotifyApi
           .getArtists(artistsLists)
@@ -181,8 +182,6 @@ export default function Home() {
     });
   });
 
-  
-
   return (
     <PrivateRoute>
       <Layout>
@@ -194,7 +193,7 @@ export default function Home() {
         {loading.state === "load_artists" ? (
           <Loader />
         ) : (
-          <div className="bg-[#323232] pt-[90px] px-10 h-full">
+          <div className="bg-[#323232] pb-36 md:pb-0 pt-[90px] md:px-10 px-6 h-full">
             <h1 className="text-4xl font-semibold text-[#ffffeb]">
               Listen Now
             </h1>
@@ -208,7 +207,8 @@ export default function Home() {
 
             <div
               className="flex flex-row w-full overflow-scroll py-5"
-              {...bind()}>
+              {...bind()}
+            >
               {artistsLists &&
                 artistsLists.map((artist: ArtistPayload, index: number) => (
                   <RegularCard data={artist} key={index} style={style} />
@@ -223,7 +223,8 @@ export default function Home() {
 
             <div
               className="flex flex-row w-full overflow-scroll py-4"
-              {...bind2()}>
+              {...bind2()}
+            >
               {recentlyPlayedTracks &&
                 recentlyPlayedTracks.map((song: any, index: number) => (
                   <RecentlyPlayedCard
@@ -260,7 +261,8 @@ export default function Home() {
 
               <div
                 className="flex flex-row w-full overflow-scroll "
-                {...bind3()}>
+                {...bind3()}
+              >
                 {newReleaseTracks &&
                   newReleaseTracks.map((song: any, index: number) => (
                     <NewReleaseCard

@@ -1,9 +1,11 @@
 import React, {
   useContext,
+  ReactNode,
   useReducer,
   useLayoutEffect,
   useEffect,
   createContext,
+  useRef
 } from "react";
 import StateReducer from "./StateReducer";
 import {
@@ -20,7 +22,8 @@ import {
   setRecentlyPlayedTracks,
   setNewReleasesTracks,
   setCurrentArtist,
-  setCurrentAlbum
+  setCurrentAlbum,
+  setGenrePlaylists
 } from "./action";
 import { checkPersistedTokens } from "../services";
 import SpotifyWebApi from "spotify-web-api-node";
@@ -50,6 +53,7 @@ const initialState: any = {
   currentPlaylist: null,
   currentPlaylistTracks: [],
   currentPlaylistOrAlbumTracksUri: [],
+  playNextUri: [],
   currentSong: null,
   prevSong: null,
   nextSong: null,
@@ -60,7 +64,11 @@ const initialState: any = {
   artistsLists: [],
   newReleaseTracks: [],
   currentArtist: null,
-  currentAlbum: null
+  currentAlbum: null,
+  openOptionModal: false as boolean,
+  openModalSongUri: '' as string,
+  genrePlaylist: [],
+  searchPopupRef: null
 };
 
 export const GlobalContext = createContext(initialState);
@@ -69,6 +77,14 @@ GlobalContext.displayName = "";
 
 export const GlobalProvider = ({ children }: Props) => {
   const [state, dispatch] = useReducer(StateReducer, initialState);
+  const ref = useRef<any>(null);
+
+  useEffect(()=>{
+    dispatch({
+      type: 'SET_SEARCH_POPUP_REF',
+      payload: ref
+    })
+  },[])
 
   useEffect(() => {
     if (checkPersistedTokens("SET_ACCESS_TOKEN")) {
@@ -202,6 +218,7 @@ export const GlobalProvider = ({ children }: Props) => {
         setGlobalSearchInput,
         setGlobalSearchResult,
         setPlaylists,
+        setGenrePlaylists,
         setCurrentPlayList,
         setCurrentSong,
         setNextSong,

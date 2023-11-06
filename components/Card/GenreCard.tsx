@@ -5,7 +5,7 @@ import AppleLogoDark from "../../assets/images/AppleLogoDark.svg";
 import AppleLogoLight from "../../assets/images/AppleLogoLight.svg";
 import CardRedPlayIcon from "../../assets/images/CradRedPlayIcon.svg";
 import { ArtistPayload, TrackPayload } from "../../interface";
-import { Genre } from '../../types'
+import { Genre } from "../../types";
 import _ from "lodash";
 import { GlobalContext } from "../../context/GlobalContext";
 import SpotifyWebApi from "spotify-web-api-node";
@@ -13,11 +13,6 @@ import SpotifyWebApi from "spotify-web-api-node";
 const spotifyApi = new SpotifyWebApi({
   clientId: "0c064b242e744e0ca6d6dbbc5458c704",
 });
-
-
-
-
-
 
 interface Props {
   data: Genre;
@@ -28,12 +23,12 @@ const truncate = (str: string, n: number) => {
 };
 
 const GenreCard = ({ data }: Props) => {
-  const { dispatch, setCurrentSong, accessToken } = useContext(GlobalContext);
+  const { dispatch, setCurrentSong, accessToken, setGenrePlaylists } =
+    useContext(GlobalContext);
 
-  useEffect(()=>{
-    if(!accessToken) return
-  },[accessToken])
-
+  useEffect(() => {
+    if (!accessToken) return;
+  }, [accessToken]);
 
   const [current_hover, set_Current_Hover] = useState<number>(0);
 
@@ -45,23 +40,36 @@ const GenreCard = ({ data }: Props) => {
     set_Current_Hover(0);
   };
 
-  const goToGenre = async()=>{
-    spotifyApi.getPlaylistsForCategory(data.spotify_meta_data,{
-      country: 'USA',
-      limit: 10,
-      offset: 0
-    })
-      .then((data)=>{
-        console.log('returned genre',data.body)
+  const goToGenre = async () => {
+    spotifyApi.setAccessToken(accessToken);
+
+    spotifyApi
+      .getPlaylistsForCategory(data.spotify_meta_data, {
+        country: "US",
+        limit: 40,
+        offset: 0,
       })
-  }
-  
+      .then((resData) => {
+        console.log("returned genre", resData.body?.playlists?.items);
+        let result: any[] = resData.body?.playlists?.items;
+        result = result.map((item: any) => {
+          return {
+            id: item.id,
+            name: item.name,
+            image: item.images,
+            uri: item.uri,
+            snapshot_id: item.snapshot_id,
+            href: item.href,
+            tracks: item.tracks,
+            owner: item.owner,
+          };
+        });
+        setGenrePlaylists(result, dispatch, data.spotify_meta_data, true);
+      });
+  };
 
   return (
-    <div
-      onClick={goToGenre}
-      className="flex-shrink-0"
-      >
+    <div onClick={goToGenre} className="flex-shrink-0">
       <div className="mt-1 rounded-xl relative">
         <div className="relative w-full">
           <Image
@@ -70,7 +78,6 @@ const GenreCard = ({ data }: Props) => {
               current_hover === data?.id ? "brightness-[.7]" : "brightness-100"
             } `}
             alt=""
-            
             onMouseEnter={() => handleMouseEnter(data?.id)}
             onMouseLeave={handleMouseLeave}
           />

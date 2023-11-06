@@ -32,7 +32,7 @@ const genre: Genre[] = [
 {
     id: 1,
     name:'Acoustic',
-    spotify_meta_data: 'guitar',
+    spotify_meta_data: 'party',
     image: AcousticImg
 },
 {
@@ -40,12 +40,6 @@ const genre: Genre[] = [
     name: 'Alternative',
     spotify_meta_data: 'alternative',
     image: AlternativeImg
-},
-{
-    id: 3,
-    name: 'Afrobeat',
-    spotify_meta_data: 'afrobeat',
-    image: AfroBeatImg
 },
 {
     id: 4,
@@ -59,18 +53,18 @@ const genre: Genre[] = [
     spotify_meta_data: 'country',
     image: CountryImg
 },
-{
+/* {
     id: 6,
     name: 'Samba',
     spotify_meta_data: 'samba',
     image: SambaImg
-},
+},*/
 {
     id: 7,
     name: 'K-pop',
-    spotify_meta_data: 'k-pop',
+    spotify_meta_data: 'kpop',
     image: KpopImg
-},
+}, 
 {
     id: 8,
     name: 'Latin',
@@ -83,17 +77,11 @@ const genre: Genre[] = [
     spotify_meta_data: 'pop',
     image: PopImg
 },
-{
+/* {
     id: 10,
     name: 'Hard Rock',
     spotify_meta_data: 'hard-rock',
     image: HardRockImg
-},
-{
-    id: 11,
-    name: 'Dance',
-    spotify_meta_data: 'dance',
-    image: DanceImg
 },
 {
     id: 12,
@@ -106,7 +94,7 @@ const genre: Genre[] = [
     name: 'Kids',
     spotify_meta_data: 'kids',
     image: KidsImg
-},
+}, */
 {
     id: 14,
     name: 'Metal',
@@ -122,7 +110,7 @@ const genre: Genre[] = [
 {
     id: 16,
     name: 'R&B',
-    spotify_meta_data: 'r-n-b',
+    spotify_meta_data: 'rnb',
     image: RnBImg
 },
 {
@@ -131,28 +119,28 @@ const genre: Genre[] = [
     spotify_meta_data: 'soul',
     image: SoulImg
 },
-{
+/* {
     id: 18,
     name: 'Electronic',
     spotify_meta_data: 'electronic',
     image: ElectronicImg
-},
+}, */
 {
     id: 19,
     name: 'Hip-Hop',
-    spotify_meta_data: 'hip-hop',
+    spotify_meta_data: 'hiphop',
     image: HipHopImg
 },
 {
     id: 20,
     name: 'J-Pop',
-    spotify_meta_data: 'j-pop',
+    spotify_meta_data: 'anime',
     image: JPopImg
 },
 {
     id: 21,
     name: 'Rock n Roll',
-    spotify_meta_data: 'rock-n-roll',
+    spotify_meta_data: 'rock',
     image: RockNRollImg
 },
 {
@@ -161,24 +149,24 @@ const genre: Genre[] = [
     spotify_meta_data: 'holidays',
     image: HolidayImg
 },
-{
+/* {
     id: 23,
     name: 'Indie',
     spotify_meta_data: 'indie',
     image: IndieImg
-},
+}, */
 {
     id: 24,
     name: 'Jazz',
     spotify_meta_data: 'jazz',
     image: JazzImg
 },
-{
+/* {
     id: 25,
     name: 'Reggae',
     spotify_meta_data: 'reggae',
     image: ReggaeImg
-}
+} */
 ]
 
 export default genre

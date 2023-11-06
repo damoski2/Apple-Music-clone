@@ -1,13 +1,13 @@
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState, useRef } from "react";
 import Image from "next/image";
-import Link from 'next/link'
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { Layout } from "../components/import";
-import StyledTable from '../components/Table'
+import StyledTable from "../components/Table";
 import { PrivateRoute } from "../utils";
 import { GlobalContext } from "../context/GlobalContext";
 import SpotifyWebApi from "spotify-web-api-node";
-import { loader_types } from '../types'
+import { loader_types } from "../types";
 
 //import 'antd/dist/reset.css';
 import { millisToMinutesAndSeconds } from "../utils";
@@ -16,7 +16,10 @@ import PlayWhiteIcon from "../assets/images/PlayWhiteIcon.svg";
 import ShufffleWhiteIcon from "../assets/images/ShuffleWhiteIcon.svg";
 import PlayListThreeDotIcon from "../assets/images/PlayListThreeDotIcon.svg";
 import SongThreeDotIcon from "../assets/images/SongThreeDotIcon.svg";
+import PlayingAnimation from "../components/PlayingAnimation";
 
+import AddToPlaylistModal from "../components/modals/AddToPlaylistModal";
+import { index } from "./artists";
 
 const spotifyApi = new SpotifyWebApi({
   clientId: "0c064b242e744e0ca6d6dbbc5458c704",
@@ -25,6 +28,7 @@ const spotifyApi = new SpotifyWebApi({
 let currentId = "";
 
 const Playlist = () => {
+  const ref = useRef<any>(null);
   const { query, isReady } = useRouter();
   const {
     currentPlaylist,
@@ -35,9 +39,44 @@ const Playlist = () => {
     setNextSong,
     setPrevSong,
     handleSetLoader,
+    currentPlaylistOrAlbumTracksUri,
   } = useContext(GlobalContext);
 
   const [current_hover, set_Current_Hover] = useState<string>("");
+  const [current_playing, set_Current_Playing] = useState<string>("");
+  const [displayOptions, setDisplayOptions] = useState<{
+    index: any;
+    state: boolean;
+  }>({
+    index: null,
+    state: false,
+  });
+
+  const handleDisplayOptionsToggle = (_index: any): void => {
+    console.log("index", _index);
+    setDisplayOptions({
+      ...displayOptions,
+      index: _index,
+      state: !displayOptions.state,
+    });
+
+    dispatch({
+      type: "SET_OPEN_MODAL_SONGURI",
+      payload: _index?.uri,
+    });
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (e: any) => {
+      if (ref?.current && !ref?.current?.contains(e.target)) {
+        setDisplayOptions({
+          index: null,
+          state: false,
+        });
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+  }, [ref]);
 
   const handleMouseEnter = (_id: string): void => {
     set_Current_Hover(_id);
@@ -58,19 +97,25 @@ const Playlist = () => {
     setPrevSong(currentPlaylistTracks[_idx - 1], dispatch);
 
     resetCurrentPlaylistTrack(_idx);
-
   };
 
-  
+  const returnCurrentSongUri = (index: any) => {
+    let _idx = currentPlaylistTracks.findIndex((elem:any)=> elem.id === index);
+    let _currentSong = currentPlaylistTracks[_idx];
+    return _currentSong?.uri;
+  };
 
-  const resetCurrentPlaylistTrack = (_songIndex: number, shuffle: boolean = false) => {
+  const resetCurrentPlaylistTrack = (
+    _songIndex: number,
+    shuffle: boolean = false
+  ) => {
     currentPlaylistTracks.forEach((track: any, index: number) => {
       let _len: number;
 
-      if(currentPlaylistTracks.length === 1){
+      if (currentPlaylistTracks.length === 1) {
         _len = 1;
-      }else{
-        _len = currentPlaylistTracks.length - 1
+      } else {
+        _len = currentPlaylistTracks.length - 1;
       }
 
       let _currIndex = _songIndex;
@@ -108,7 +153,13 @@ const Playlist = () => {
     if (!isReady) return;
     if (!query.playlist_id) return;
 
-    handleSetLoader({ state: 'load_playlist', value: true } as { state: loader_types, value: boolean }, dispatch)
+    handleSetLoader(
+      { state: "load_playlist", value: true } as {
+        state: loader_types;
+        value: boolean;
+      },
+      dispatch
+    );
 
     spotifyApi.getPlaylist(query.playlist_id as string).then((data) => {
       let playlist = data.body;
@@ -152,26 +203,41 @@ const Playlist = () => {
         payload: tracks,
       });
     });
-    handleSetLoader({ state: 'not_loading', value: false } as { state: loader_types, value: boolean }, dispatch)
+    handleSetLoader(
+      { state: "not_loading", value: false } as {
+        state: loader_types;
+        value: boolean;
+      },
+      dispatch
+    );
   }, [accessToken, isReady, query]);
 
-  useEffect(()=>{
-    if(currentPlaylistTracks.length === 0) return
+  useEffect(() => {
+    if (currentPlaylistTracks.length === 0) return;
     currentId = currentPlaylistTracks[0].id;
     let _idx = currentPlaylistTracks.findIndex(findSongIndex);
     let _currentSong = currentPlaylistTracks[_idx];
-    setCurrentSong(_currentSong, dispatch);
+    /*  setCurrentSong(_currentSong, dispatch);
     setNextSong(currentPlaylistTracks[_idx + 1], dispatch);
-    setPrevSong(currentPlaylistTracks[_idx - 1], dispatch);
-  },[currentPlaylistTracks]);
+    setPrevSong(currentPlaylistTracks[_idx - 1], dispatch); */
+  }, [currentPlaylistTracks]);
 
-  const handlePlaylistPlay = ()=>{
-    resetCurrentPlaylistTrack(0)
-  }
+  const handlePlaylistPlay = () => {
+    resetCurrentPlaylistTrack(0);
+  };
 
-  const handlePlaylistShuffle = ()=>{
-    resetCurrentPlaylistTrack(0, true)
-  }
+  const handlePlaylistShuffle = () => {
+    resetCurrentPlaylistTrack(0, true);
+  };
+
+  //Watch change in playing song for what currently playing
+  useEffect(() => {
+    console.log('changed!!!!')
+    currentPlaylistOrAlbumTracksUri.length > 0 &&
+      set_Current_Playing(currentPlaylistOrAlbumTracksUri[0]);
+  }, [currentPlaylistOrAlbumTracksUri]);
+
+
 
   const columns = [
     {
@@ -185,26 +251,33 @@ const Playlist = () => {
             currentId = index.id;
             handleSetCurrentSong(index);
           }}
-          className="flex flex-row items-center relative cursor-pointer">
+          className="flex flex-row items-center relative cursor-pointer"
+        >
           <Image
             src={data.preview_image}
             alt=""
             width={40}
             height={40}
             className={`backdrop-blur-sm ${
-              current_hover === index?.id ? "brightness-[.3]" : "brightness-100"
+              current_hover === index?.id || (returnCurrentSongUri(index.id) === current_playing) ? "brightness-[.3]" : "brightness-100"
             }`}
             onMouseEnter={() => handleMouseEnter(index?.id)}
             onMouseLeave={handleMouseLeave}
           />
-          <Image
-            src={PlayWhiteIcon}
-            alt=""
-            onMouseEnter={() => handleMouseEnter(index?.id)}
-            className={`absolute left-4 ${
-              current_hover === index?.id ? "opacity-100" : "opacity-0"
-            }`}
-          />
+          {returnCurrentSongUri(index.id) === current_playing ? (
+            <div className="absolute left-2 z-30" >
+              <PlayingAnimation />
+              </div>
+          ) : (
+            <Image
+              src={PlayWhiteIcon}
+              alt=""
+              onMouseEnter={() => handleMouseEnter(index?.id)}
+              className={`absolute left-4 ${
+                current_hover === index?.id ? "opacity-100" : "opacity-0"
+              }`}
+            />
+          )}
           <a className="ml-2 hover:decoration-transparent ">{data.name}</a>
         </div>
       ),
@@ -214,8 +287,8 @@ const Playlist = () => {
       dataIndex: "artist",
       key: "artist",
       render: (data: any, index: any) => (
-        <Link href={`/artists/${index.artistId}`} >
-          <p className="cursor-pointer" >{index.artist}</p>
+        <Link href={`/artists/${index.artistId}`}>
+          <p className="cursor-pointer">{index.artist}</p>
         </Link>
       ),
     },
@@ -228,19 +301,34 @@ const Playlist = () => {
       title: "Time",
       dataIndex: "time",
       key: "time",
-      render: (text: string) => (
-        <div className="flex flex-row items-center ">
-          <p className="mr-2 mb-0">{text}</p>
-          <Image src={SongThreeDotIcon} alt="" className="cursor-pointer" />
+      render: (data: any, index: any) => (
+        <div className="flex flex-row items-center relative">
+          <p className="mr-2 mb-0">{data}</p>
+          <Image
+            onClick={() => handleDisplayOptionsToggle(index)}
+            src={SongThreeDotIcon}
+            alt=""
+            className="cursor-pointer"
+          />
+          <div className={`absolute z-50 left-16 top-4 w-fit`}>
+            {displayOptions.index === index && (
+              <AddToPlaylistModal refPasser={ref} />
+            )}
+          </div>
         </div>
       ),
     },
   ];
 
+  /*  */
   return (
     <PrivateRoute>
       <Layout>
-        <div className="h-screen bg-[#323232] pt-[90px] px-10">
+        <div
+          className={`${
+            currentPlaylistTracks.length >= 7 ? "h-full" : "h-screen"
+          } bg-[#323232] pt-[90px] px-10`}
+        >
           <div className="flex flex-row">
             <Image
               src={currentPlaylist?.image[0].url}
@@ -260,11 +348,17 @@ const Playlist = () => {
               </p>
 
               <div className="flex flex-row w-full mt-16">
-                <button onClick={handlePlaylistPlay} className="bg-[#d60017] rounded-[6px] h-7 px-3 text-white flex flex-row justify-center items-center w-[124px] text-xs">
+                <button
+                  onClick={handlePlaylistPlay}
+                  className="bg-[#d60017] rounded-[6px] h-7 px-3 text-white flex flex-row justify-center items-center w-[124px] text-xs"
+                >
                   <Image src={PlayWhiteIcon} alt="" />{" "}
                   <span className="ml-2">Play</span>
                 </button>
-                <button onClick={handlePlaylistShuffle} className="bg-[#d60017] rounded-[6px] h-7 px-3 text-white flex flex-row justify-center items-center w-[124px] text-xs ml-2.5">
+                <button
+                  onClick={handlePlaylistShuffle}
+                  className="bg-[#d60017] rounded-[6px] h-7 px-3 text-white flex flex-row justify-center items-center w-[124px] text-xs ml-2.5"
+                >
                   <Image src={ShufffleWhiteIcon} alt="" />
                   <span className="ml-2">Shuffle</span>
                 </button>
@@ -275,16 +369,16 @@ const Playlist = () => {
           <div className="w-full mt-16">
             {currentPlaylistTracks && (
               <StyledTable
-              columns={columns}
-              dataSource={currentPlaylistTracks}
-              scroll={{ y: 650 }}
-              pagination={
-                currentPlaylistTracks.length > 500 && {
-                  defaultPageSize: 10,
-                  hideOnSinglePage: true,
+                columns={columns}
+                dataSource={currentPlaylistTracks}
+                scroll={{ y: 650 }}
+                pagination={
+                  currentPlaylistTracks.length > 500 && {
+                    defaultPageSize: 10,
+                    hideOnSinglePage: true,
+                  }
                 }
-              }
-            />
+              />
             )}
           </div>
         </div>

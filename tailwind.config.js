@@ -7,10 +7,19 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        'sf-pro': ['SF-Pro']
-      }
+        "sf-pro": ["SF-Pro"],
+      },
+      keyframes: {
+        playmusic: {
+          "0%, 100%": { height: "10px" },
+          "50%": { height: "40%" },
+        },
+      },
+      animation: {
+        playmusic: "1s infinite",
+      },
     },
   },
   plugins: [],
-  mode: 'jit'
-}
+  mode: "jit",
+};

@@ -10,6 +10,10 @@ background: transparent !important;
 color: #fff !important;
 width: 100% !important;
 
+.ant-table-wrapper{
+  height: 20vh !important;
+}
+
 tr{
   :nth-child(even){
     background: #1f1f1f !important;
@@ -50,6 +54,7 @@ tr{
 
 table{
   width: 100% !important;
+
 }
 `;
 

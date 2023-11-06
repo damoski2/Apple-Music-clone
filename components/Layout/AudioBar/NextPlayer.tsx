@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import SpotifyPlayer from "react-spotify-web-playback";
 import { GlobalContext } from "../../../context/GlobalContext";
 
@@ -15,10 +15,10 @@ const NextPlayer = () => {
     currentPlaylistOrAlbumTracksUri,
   } = useContext(GlobalContext);
   const [play, setPlay] = useState(false);
-  const [stateTracks, setStateTracks] = useState<any>([]);
+  //const [stateTracks, setStateTracks] = useState<any>([]);
 
-  useEffect(() => {
-    setStateTracks(currentPlaylistOrAlbumTracksUri);
+  const stateTracks: any[] = useMemo(() => {
+    return currentPlaylistOrAlbumTracksUri;
   }, [currentPlaylistOrAlbumTracksUri]);
 
   if (!accessToken) return null;
@@ -26,7 +26,7 @@ const NextPlayer = () => {
   if (currentPlaylistOrAlbumTracksUri.length < 1) return null;
 
   return (
-    stateTracks.length > 0 && (
+    stateTracks.length > 0 ? (
       <SpotifyPlayer
         token={accessToken}
         showSaveIcon
@@ -44,18 +44,12 @@ const NextPlayer = () => {
         }}
         callback={(state) => {
           if (!state.isPlaying) setPlay(false);
-
           if (state.track.uri !== currentSong?.uri) {
             setCurrentSong(state.track, dispatch);
           }
-
-          /*   if(state.nextTracks[0]?.uri !== nextSong?.uri){
-          setNextSong(state.nextTracks[0], dispatch)
-        }
- */
         }}
       />
-    )
+    ) : null
   );
 };
 

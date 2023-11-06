@@ -178,7 +178,7 @@ const Index = ({ refPasser }: { refPasser: React.MutableRefObject<any> }) => {
         {/* {displaySearchResult && searchResults.length > 0 && <SearchResultModal />} */}
       </div>
       <div className="flex flex-col w-full items-start mt-4">
-        <span className="text-[10px] text-[#BFBFBF]">Apple Music</span>
+        <span className="text-[10px] text-[#BFBFBF] font-semibold">Apple Music</span>
         <ul className="w-full mt-2">
           <li
             onClick={() => router.push(`/?code=${auth_code}`)}
@@ -211,10 +211,10 @@ const Index = ({ refPasser }: { refPasser: React.MutableRefObject<any> }) => {
             <div className="w-[20px]">
               <Image src={RadioIcon} alt="" />
             </div>
-            <span className="ml-2 text-white text-[13px]">Radio</span>
+            <span className="ml-2 text-white/[0.4] text-[13px]">Radio</span>
           </li>
         </ul>
-        <span className="text-[10px] mt-5 text-[#BFBFBF]">Library</span>
+        <span className="text-[10px] mt-5 text-[#BFBFBF] font-semibold">Library</span>
         <ul className="w-full">
           <li
             className={`flex w-full flex-row cursor-pointer items-center pl-3 py-1.5 rounded-md ${
@@ -224,7 +224,7 @@ const Index = ({ refPasser }: { refPasser: React.MutableRefObject<any> }) => {
             <div className="w-[20px]">
               <Image src={RecentlyAddedIcon} alt="" />
             </div>
-            <span className="ml-2 text-white text-[13px]">Recently Added</span>
+            <span className="ml-2 text-white/[0.4] text-[13px]">Recently Added</span>
           </li>
           <li
             className={`flex w-full flex-row cursor-pointer items-center pl-3 py-1.5 rounded-md ${
@@ -234,7 +234,7 @@ const Index = ({ refPasser }: { refPasser: React.MutableRefObject<any> }) => {
             <div className="w-[20px]">
               <Image src={ArtistIcon} alt="" />
             </div>
-            <span className="ml-2 text-white text-[13px]">Artists</span>
+            <span className="ml-2 text-white/[0.4] text-[13px]">Artists</span>
           </li>
           <li
             className={`flex w-full flex-row cursor-pointer items-center pl-3 py-1.5 rounded-md ${
@@ -244,7 +244,7 @@ const Index = ({ refPasser }: { refPasser: React.MutableRefObject<any> }) => {
             <div className="w-[20px]">
               <Image src={AlbumsIcon} alt="" />
             </div>
-            <span className="ml-2 text-white text-[13px]">Albums</span>
+            <span className="ml-2 text-white/[0.4] text-[13px]">Albums</span>
           </li>
           <li
             className={`flex w-full flex-row cursor-pointer items-center pl-3 py-1.5 rounded-md ${
@@ -254,10 +254,10 @@ const Index = ({ refPasser }: { refPasser: React.MutableRefObject<any> }) => {
             <div className="w-[20px]">
               <Image src={SongsIcon} alt="" />
             </div>
-            <span className="ml-2 text-white text-[13px]">Songs</span>
+            <span className="ml-2 text-white/[0.4] text-[13px]">Songs</span>
           </li>
         </ul>
-        <span className="text-[10px] mt-5 text-[#BFBFBF]">Playlist</span>
+        <span className="text-[10px] mt-5 text-[#BFBFBF] font-semibold">Playlist</span>
         <ul className="w-full">
           {playlists &&
             playlists.map((item: any, index: number) => (

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useRef } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import { GlobalContext } from "../../context/GlobalContext";
@@ -14,15 +14,17 @@ import ArtsistPlayIcon from "../../assets/images/CradRedPlayIcon.svg";
 import ArrowRightIcon from "../../assets/images/ArrowRight.svg";
 import PlayListThreeDotIcon from "../../assets/images/PlayListThreeDotIcon.svg";
 import PlayWhiteIcon from "../../assets/images/PlayWhiteIcon.svg";
+import AddToPlaylistModal from "../../components/modals/AddToPlaylistModal";
 
 const spotifyApi = new SpotifyWebApi({
   clientId: "0c064b242e744e0ca6d6dbbc5458c704",
 });
 
 const Index = () => {
+  const ref = useRef<any>(null);
   const router = useRouter();
   const { id } = router.query;
-  const { dispatch, accessToken, setCurrentArtist } = useContext(GlobalContext);
+  const { dispatch, accessToken, setCurrentArtist,  } = useContext(GlobalContext);
 
   const [artist, setArtist] = useState<any>({
     artistInfo: null,
@@ -30,6 +32,13 @@ const Index = () => {
     artistTopTracks: null,
     artistRelatedArtist: null,
     artistAbout: null,
+  });
+  const [displayOptions, setDisplayOptions] = useState<{
+    index: any;
+    state: boolean;
+  }>({
+    index: null,
+    state: false,
   });
 
   const [current_hover, set_Current_Hover] = useState<string>("");
@@ -121,12 +130,40 @@ const Index = () => {
     //console.log(_trackUri)
   };
 
+  const handleDisplayOptionsToggle = (_index: number, _track: any): void => {
+    //console.log("index", _index);
+    setDisplayOptions({
+      ...displayOptions,
+      index: _index,
+      state: !displayOptions.state,
+    });
+
+    console.log( 'song uri' ,_track?.uri)
+
+    dispatch({
+      type: 'SET_OPEN_MODAL_SONGURI',
+      payload: _track?.uri
+    })
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (e: any) => {
+      if (ref?.current && !ref?.current?.contains(e.target)) {
+        setDisplayOptions({
+          index: null,
+          state: false,
+        });
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+  }, [ref]);
+
   return (
     <PrivateRoute>
       <Layout>
         <main className="h-full">
           <div className="bg-[#323232] px-10 h-[44vh] flex flex-col justify-end">
-            <div className="flex justify-center items-center h-[80%] w-full">
+            <div className="flex justify-center items-center h-[60%] w-full">
               {artistInfo && (
                 <Image
                   width={190}
@@ -158,13 +195,14 @@ const Index = () => {
               </h2>
               <Image src={ArrowRightIcon} alt="" />
             </div>
-            <div className="mt-2 grid grid-rows-3 grid-flow-col overflow-x-scroll ">
+            <div className="mt-2 grid grid-rows-3 grid-flow-col">
               {artistTopTracks?.tracks.map((track: any, index: number) => (
                 <div key={index} className="max-w-[319px] w-[319px] mb-2 ">
                   <Divider className="h-[.001px] mt-1 mb-2 bg-[#4D4D4D]" />
                   <div
                     key={index}
-                    className="flex flex-row justify-between items-center relative">
+                    className="flex flex-row justify-between items-center relative"
+                  >
                     <div
                       onClick={() => {
                         dispatch({
@@ -172,7 +210,8 @@ const Index = () => {
                           payload: [track?.uri],
                         });
                       }}
-                      className="flex flex-row">
+                      className="flex flex-row"
+                    >
                       <Image
                         width={40}
                         height={40}
@@ -208,9 +247,15 @@ const Index = () => {
                     </div>
                     <Image
                       src={PlayListThreeDotIcon}
+                      onClick={() => handleDisplayOptionsToggle(index,track)}
                       className="cursor-pointer"
                       alt=""
                     />
+                    <div className={`absolute z-50 left-16 top-4 w-fit`}>
+                      {displayOptions.index === index && (
+                        <AddToPlaylistModal refPasser={ref} />
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -250,7 +295,8 @@ const Index = () => {
                     <div
                       onClick={() => setCurrentArtist(artist, dispatch)}
                       key={index}
-                      className="flex flex-col items-center mr-[15px] cursor-pointer">
+                      className="flex flex-col items-center mr-[15px] cursor-pointer"
+                    >
                       <Image
                         width={108.75}
                         height={108.75}
