@@ -7,7 +7,7 @@ export default async function handler(req: NextApiRequest,res: NextApiResponse){
     const code = req.body.code
     //console.log('code', code)
     const spotifyApi = new spotifyWebApi({
-        redirectUri: 'http://localhost:3000',
+        redirectUri: process.env.NODE_ENV === 'development'?  'http://localhost:3000' : 'https://apple-music-cloned.vercel.app/',
         clientId: '0c064b242e744e0ca6d6dbbc5458c704',
         clientSecret: 'c3395ad6266840c39692fe0cda0ff84c'
     })

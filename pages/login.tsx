@@ -7,7 +7,7 @@ import logo from "../assets/images/logo.png";
 const AUTH_URL = `https://accounts.spotify.com/authorize?client_id=0c064b242e744e0ca6d6dbbc5458c704&response_type=code&redirect_uri=${
   process.env.NODE_ENV === "development"
     ? 'http://localhost:3000'
-    : process.env.NEXT_REDIRECT_PROD_URL
+    : "https://apple-music-cloned.vercel.app/"
 }&scope=streaming%20user-read-email%20user-read-recently-played%20user-read-private%20user-library-read%20user-library-modify%20user-read-playback-state%20user-modify-playback-state%20playlist-modify-public%20playlist-modify-private`;
 
 const login = () => {
